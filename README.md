@@ -1,20 +1,42 @@
-# Team X - Successorator 
+# Team 23 - Successorator 
 
 ---
+## Overview
+Successorator is an Android app, designed to help people keep track of their daily goals. By simplifying the process of creating, tracking, and finishing daily goals, it will help users stay organized and on task.
 
-This is the mostly empty template for the Successorator project.
+## Features
+- **Simple Goal Entry:** Daily goals can be created by typing or by speaking into the microphone.
+- **Completion Tracking:** Created goals can be marked finished with a single tap, and they will be crossed off the to-do list.
+- **Self-Cleaning:** Goals marked finished will automatically be cleared by the end of the day.
+- **Goal Rollover:** Goals not finished for that day will automatically be rolled over to the next day.
 
-## Getting Started
+## Project Tasks - Iteration 1
 
- - [ ] Look around the project.
-   - The `docs/` directory may be helpful, as Slack/Discord messages are easy to lose.
-     - This is a good place to put finalized user stories, standards, guidelines, meeting notes, etc
-       that you want to stick with the repository in perpetuity (e.g. after the semester ends) e.g.
-       for portfolio purposes.
-     - Google Docs is easier for collaboration, but eventually you might want to put the
-       finalized versions here for reference. (This way you can also reference them in PRs!)
- - [ ] Modify the `.github/pull_request_template.md` to suit your needs.
-   - You **do not** need to use the exact same template, but justify your changes when you 
-     PR the updated template.
- - [ ] Replace this README with something appropriate.
-   - **When you do, replace the title to replace X with your team number.**
+### Type a Goal - 8 Hours - High Priority
+- [ ] - Android persistent storage (2hr)
+- [ ] - UI for entry into goal screen (0.5hr)
+- [ ] - UI for goal entry menu (1hr)
+- [ ] - UI for goal list (1hr)
+- [ ] - Hook up data for goal list (1hr)
+- [ ] - Tests (2hr)
+
+### Tap to Complete Goal - 4 Hours - High Priority
+- [ ] - Required data changes to support complete goals (1hr)
+- [ ] - UI for completing goals (2hr)
+- [ ] - Write tests to ensure pressing button does what is required (1hr)
+
+### Tap to Complete Goal - 4 Hours - High Priority
+- [ ] - Add time listener for 2 am (0.5hr)
+- [ ] - Necessary data layer changes to make done goals stop displaying (0.5hr)
+- [ ] - Mock time (0.5hr)
+- [ ] - Tests for time handling (0.5hr)
+
+### Tap to Uncomplete Goal - 2 Hours - Medium Priority
+- [ ] - UI for un-completing goals (1hr)
+- [ ] - Write tests (1hr)
+
+### Miscellaneous Taks - 2 Hours
+- [x] - Setup GitHub repo (branch protection, CI, etc) (1hr)
+- [ ] - Create app in android studio and push basic stuff to git (1hr)
+
+
