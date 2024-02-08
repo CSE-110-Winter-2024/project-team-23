@@ -4,15 +4,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class Goal {
-    private final @Nullable Integer sortOrder;
+    private final @Nullable Integer id;
     private final @NonNull String content;
+    private final int sortOrder;
     private boolean completed;
 
     //Constructors
-    public Goal (@Nullable Integer sortOrder, @NonNull String content) {
-        this.sortOrder = sortOrder;
+    public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
+                boolean completed) {
+        this.id = id;
         this.content = content;
-        this.completed = false;
+        this.sortOrder = sortOrder;
+        this.completed = completed;
     }
 
     //Functionality
@@ -23,11 +26,15 @@ public class Goal {
 
     //Accessor Methods
     public @Nullable Integer id() {
-        return sortOrder;
+        return id;
     }
 
     public @NonNull String content() {
         return content;
+    }
+
+    public int sortOrder() {
+        return sortOrder;
     }
 
     public boolean completed() {
