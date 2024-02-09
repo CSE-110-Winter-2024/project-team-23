@@ -40,4 +40,12 @@ public class GoalEntity {
     public Goal toGoal() {
         return new Goal(id, content, sortOrder, completed);
     }
+
+    public void toggleCompleted() {
+        if (this.completed) {
+            this.completed = true;
+        } else {
+            this.completed = false;
+        }
+    }
 }
