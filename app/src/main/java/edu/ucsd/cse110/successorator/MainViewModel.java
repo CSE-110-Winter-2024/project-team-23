@@ -14,6 +14,7 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
+import edu.ucsd.cse110.successorator.lib.util.Subject;
 
 public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepository;
@@ -76,5 +77,18 @@ public class MainViewModel extends ViewModel {
             // TODO: use mock date
             goalRepository.update(goal.markComplete(new java.util.Date()));
         }
+    }
+
+    public Subject<List<Goal>> getIncompleteGoals() {
+        return incompleteGoals;
+    }
+
+    public Subject<List<Goal>> getCompleteGoalsToDisplay() {
+        return completeGoalsToDisplay;
+    }
+
+    public void addGoal(String contents) {
+        var newGoal = new Goal(null, contents, 0, false, new java.util.Date());
+        goalRepository.append(newGoal);
     }
 }

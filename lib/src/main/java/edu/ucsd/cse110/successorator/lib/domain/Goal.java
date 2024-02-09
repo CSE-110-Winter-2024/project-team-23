@@ -10,15 +10,16 @@ public class Goal {
     private final @NonNull String content;
     private final int sortOrder;
     private boolean completed;
-    private Date completionDate;
+    private @NonNull Date completionDate;
 
     //Constructors
     public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
-                boolean completed, Date completionDate) {
+                boolean completed, @NonNull Date completionDate) {
         this.id = id;
         this.content = content;
         this.sortOrder = sortOrder;
         this.completed = completed;
+        this.completionDate = completionDate;
     }
 
     public Goal markIncomplete() {
@@ -27,7 +28,7 @@ public class Goal {
         return new Goal(id, content, sortOrder, !completed, completionDate);
     }
 
-    public Goal markComplete(Date completionDate) {
+    public Goal markComplete(@NonNull Date completionDate) {
         // We assume method won't be called if goal is already complete
         return new Goal(id, content, sortOrder, true, completionDate);
     }
@@ -54,7 +55,7 @@ public class Goal {
         return completed;
     }
 
-    public Date completionDate() {
+    public @NonNull Date completionDate() {
         return completionDate;
     }
 }
