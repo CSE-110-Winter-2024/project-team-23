@@ -38,6 +38,7 @@ public class GoalEntity {
     }
 
     public Goal toGoal() {
-        return new Goal(id, content, sortOrder, completed);
+        // TODO: date support
+        return new Goal(id, content, sortOrder, completed, null);
     }
 }
