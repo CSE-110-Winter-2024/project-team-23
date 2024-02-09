@@ -68,4 +68,13 @@ public class MainViewModel extends ViewModel {
             this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
         });
     }
+
+    public void pressComplete(Goal goal) {
+        if (goal.completed()) {
+            goalRepository.update(goal.markIncomplete());
+        } else {
+            // TODO: use mock date
+            goalRepository.update(goal.markComplete(new java.util.Date()));
+        }
+    }
 }

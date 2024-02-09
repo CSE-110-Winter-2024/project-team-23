@@ -22,15 +22,18 @@ public class Goal {
     }
 
     public Goal markIncomplete() {
-        return new Goal(id, content, sortOrder, !completed, null);
+        // Keeping old completion date is fine; it will be overwritten
+        // We assume method won't be called if goal is already incomplete
+        return new Goal(id, content, sortOrder, !completed, completionDate);
     }
 
     public Goal markComplete(Date completionDate) {
+        // We assume method won't be called if goal is already complete
         return new Goal(id, content, sortOrder, true, completionDate);
     }
 
     public Goal withSortOrder(int sortOrder) {
-        return new Goal(id, content, sortOrder, completed, null);
+        return new Goal(id, content, sortOrder, completed, completionDate);
     }
 
 
@@ -49,5 +52,9 @@ public class Goal {
 
     public boolean completed() {
         return completed;
+    }
+
+    public Date completionDate() {
+        return completionDate;
     }
 }
