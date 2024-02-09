@@ -41,7 +41,7 @@ public class MainViewModel extends ViewModel {
             return;
         }
 
-        offset = offset.add(24 * 60 * 60);
+        offset = offset.addDay();
         dateOffset.setValue(offset);
     }
 }

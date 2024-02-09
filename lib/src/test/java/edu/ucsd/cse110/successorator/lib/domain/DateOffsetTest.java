@@ -2,6 +2,10 @@ package edu.ucsd.cse110.successorator.lib.domain;
 
 import static org.junit.Assert.*;
 
+import org.junit.Test;
+
+import java.util.Calendar;
+
 // File generated with copilot
 public class DateOffsetTest {
 

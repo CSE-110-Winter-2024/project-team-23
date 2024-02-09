@@ -21,6 +21,10 @@ public class DateOffset {
         return new DateOffset(this.seconds + seconds);
     }
 
+    public DateOffset addDay() {
+        return add(24 * 60 * 60);
+    }
+
     public Date now() {
         // Used below link to determine idiomatic way to get current time
         // https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android

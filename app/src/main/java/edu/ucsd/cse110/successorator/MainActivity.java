@@ -2,6 +2,8 @@ package edu.ucsd.cse110.successorator;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +32,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         view.dateAdvanceButton.setOnClickListener(v -> activityModel.advance24Hours());
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable updateDateTask = new Runnable() {
+            @Override
+            public void run() {
+                view.dateDebugText.setText(activityModel.getDateOffset().getValue().now().toString());
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+        handler.post(updateDateTask);
 
         setContentView(view.getRoot());
     }
