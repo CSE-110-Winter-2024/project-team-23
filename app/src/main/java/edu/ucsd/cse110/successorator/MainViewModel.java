@@ -29,7 +29,7 @@ public class MainViewModel extends ViewModel {
 
     public void tapToComplete(int id) {
         Goal goal = goalRepository.find(id).getValue();
-        goal.toggleCompleted;
+        goal.toggleCompleted();
         goalRepository.update(goal);
     }
 
