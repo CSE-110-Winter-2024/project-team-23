@@ -26,23 +26,12 @@ public class MainActivity extends AppCompatActivity {
         var modelProvider = new ViewModelProvider(this, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
-        activityModel.getDateOffset().observe(offset -> {
-            if (offset == null) return;
-            view.dateDebugText.setText(offset.now().toString());
+        activityModel.getCurrentDate().observe(date -> {
+            if (date == null) return;
+            view.dateDebugText.setText(date.toString());
         });
 
         view.dateAdvanceButton.setOnClickListener(v -> activityModel.advance24Hours());
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        Runnable updateDateTask = new Runnable() {
-            @Override
-            public void run() {
-                view.dateDebugText.setText(activityModel.getDateOffset().getValue().now().toString());
-                handler.postDelayed(this, 1000);
-            }
-        };
-
-        handler.post(updateDateTask);
 
         setContentView(view.getRoot());
     }

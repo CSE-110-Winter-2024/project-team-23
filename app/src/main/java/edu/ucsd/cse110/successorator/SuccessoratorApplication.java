@@ -1,6 +1,8 @@
 package edu.ucsd.cse110.successorator;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.room.Room;
 
@@ -14,6 +16,8 @@ import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 public class SuccessoratorApplication extends Application {
     private GoalRepository goalRepository;
     private MutableSubject<DateOffset> dateOffset;
+    // Ticks every second; useful for propagating time updates to the app
+    private MutableSubject<Object> dateTicker;
 
     @Override
     public void onCreate() {
@@ -32,6 +36,19 @@ public class SuccessoratorApplication extends Application {
         var dateOffset = new DateOffset(0);
         this.dateOffset = new SimpleSubject<>();
         this.dateOffset.setValue(dateOffset);
+
+        this.dateTicker = new SimpleSubject<>();
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable updateDateTask = new Runnable() {
+            @Override
+            public void run() {
+                dateTicker.setValue(null);
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+        handler.post(updateDateTask);
     }
 
     public GoalRepository getGoalRepository() {
@@ -40,5 +57,9 @@ public class SuccessoratorApplication extends Application {
 
     public MutableSubject<DateOffset> getDateOffset() {
         return dateOffset;
+    }
+
+    public MutableSubject<Object> getDateTicker() {
+        return dateTicker;
     }
 }
