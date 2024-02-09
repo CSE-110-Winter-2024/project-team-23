@@ -24,7 +24,7 @@ public class MainViewModel extends ViewModel {
             );
 
     public MainViewModel(GoalRepository goalRepository) {
-        this.goalRepository = goalRepository;
+        this.goalRepository = goalRepository();
     }
 
     public void tapToComplete(int id) {
