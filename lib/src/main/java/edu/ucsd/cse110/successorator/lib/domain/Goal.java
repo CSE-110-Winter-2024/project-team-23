@@ -1,41 +1,43 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import androidx.annotation.NonNull;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.Nullable;
 
 public class Goal {
-    private final @Nullable Integer sortOrder;
-    private final @NotNull String content;
+    private final @Nullable Integer id;
+    private final @NonNull String content;
+    private final int sortOrder;
     private boolean completed;
 
     //Constructors
-    public Goal (Integer sortOrder, String content) {
-        this.sortOrder = sortOrder;
+    public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
+                boolean completed) {
+        this.id = id;
         this.content = content;
-        this.completed = false;
+        this.sortOrder = sortOrder;
+        this.completed = completed;
     }
 
     //Functionality
-    public void swapCompleted() {
-        this.completed = !(completed);
+    public void toggleCompleted() {
+        this.completed = !completed;
     }
 
 
     //Accessor Methods
-    public @androidx.annotation.Nullable Integer id() {
-        return sortOrder;
+    public @Nullable Integer id() {
+        return id;
     }
 
     public @NonNull String content() {
         return content;
     }
 
+    public int sortOrder() {
+        return sortOrder;
+    }
+
     public boolean completed() {
         return completed;
     }
-
-
-
 }
