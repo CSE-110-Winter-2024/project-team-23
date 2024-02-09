@@ -24,8 +24,9 @@
         android:text="TextView"
         android:textSize="36sp"
         app:layout_constraintBottom_toTopOf="@+id/placeholder_text"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="164dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/date_advance_button"
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:text="Date Advance"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/placeholder_text"
-        tools:layout_editor_absoluteX="142dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/placeholder_text" />
 </androidx.constraintlayout.widget.ConstraintLayout>
