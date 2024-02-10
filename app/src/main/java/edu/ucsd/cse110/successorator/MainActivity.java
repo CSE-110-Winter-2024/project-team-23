@@ -70,4 +70,9 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    //Necessary for testing.
+    public GoalListAdapter getListAdapter() {
+        return listAdapter;
+    }
 }

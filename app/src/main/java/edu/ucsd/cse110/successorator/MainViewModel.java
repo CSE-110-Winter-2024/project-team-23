@@ -23,8 +23,6 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<List<Goal>> completeGoalsToDisplay;
     private final MutableSubject<List<Goal>> incompleteGoals;
 
-
-
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
