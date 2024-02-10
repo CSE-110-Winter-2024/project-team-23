@@ -1,7 +1,7 @@
 package edu.ucsd.cse110.successorator;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,5 +17,11 @@ public class MainActivity extends AppCompatActivity {
         view.placeholderText.setText(R.string.hello_world);
 
         setContentView(view.getRoot());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_bar, menu);
+        return true;
     }
 }
