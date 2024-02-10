@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Inflate View
         this.view = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
-        view.placeholderText.setText(R.string.hello_world);
 
         //Initialize viewModel
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
