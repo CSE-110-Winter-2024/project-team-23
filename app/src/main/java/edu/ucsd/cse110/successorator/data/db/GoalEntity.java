@@ -22,7 +22,7 @@ public class GoalEntity {
     public int sortOrder;
 
     @ColumnInfo(name = "completed")
-    public boolean completed = false;
+    public boolean completed;
 
     @ColumnInfo(name = "completionDate")
     public long completionDate;

@@ -9,8 +9,8 @@ public class Goal {
     private final @Nullable Integer id;
     private final @NonNull String content;
     private final int sortOrder;
-    private boolean completed;
-    private @NonNull Date completionDate;
+    private final boolean completed;
+    private final @NonNull Date completionDate;
 
     //Constructors
     public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
