@@ -26,7 +26,7 @@ public class Goal {
         return new Goal(id, content, sortOrder, !completed, completionDate);
     }
 
-    public Goal markComplete(@NonNull long completionDate) {
+    public Goal markComplete(@NonNull Long completionDate) {
         // We assume method won't be called if goal is already complete
         return new Goal(id, content, sortOrder, true, completionDate);
     }
@@ -53,7 +53,7 @@ public class Goal {
         return completed;
     }
 
-    public @NonNull long completionDate() {
+    public @NonNull Long completionDate() {
         return completionDate;
     }
 }

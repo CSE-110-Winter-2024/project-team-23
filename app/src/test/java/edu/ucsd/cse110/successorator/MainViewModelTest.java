@@ -59,7 +59,7 @@ public class MainViewModelTest {
         var completeGoals = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertNotNull(completeGoals);
         assertEquals((Integer) 1, completeGoals.get(0).id());
-        assertEquals(TimeUtils.START_TIME, completeGoals.get(0).completionDate());
+        assertEquals((Long) TimeUtils.START_TIME, completeGoals.get(0).completionDate());
 
         // Verify that goal IDs 2, 3 are in the incomplete goals list and ids 1, 4, 5, 6 are not
         incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
