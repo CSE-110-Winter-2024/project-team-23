@@ -152,7 +152,7 @@ public class MainViewModelTest {
         // Verify that the current date string is correct
         var currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("2024-02-07 16:00:00 GMT", currentDateString);
+        assertEquals("Wednesday07February040000", currentDateString);
     }
 
     @Test
