@@ -1,38 +1,87 @@
 package edu.ucsd.cse110.successorator;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import static androidx.core.content.ContentProviderCompat.requireContext;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
+import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
 public class MainActivity extends AppCompatActivity {
-    private MainViewModel activityModel;
+
+    private MainViewModel mainViewModel;
+    private ActivityMainBinding view;
+    private GoalListAdapter listAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        var view = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
-        view.placeholderText.setText(R.string.hello_world);
+        //Inflate View
+        this.view = ActivityMainBinding.inflate(getLayoutInflater(), null, false);
 
-
+        //Initialize viewModel
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(this, modelFactory);
-        this.activityModel = modelProvider.get(MainViewModel.class);
+        this.mainViewModel = modelProvider.get(MainViewModel.class);
 
-        activityModel.getCurrentDateString().observe(str -> {
+        //Initialize list adapter
+        this.listAdapter = new GoalListAdapter(this.getApplicationContext(), List.of());
+        mainViewModel.getIncompleteGoals().observe(goals -> {
+            if (goals == null) return;
+            listAdapter.clear();
+            listAdapter.addAll(new ArrayList<>(goals));
+            listAdapter.notifyDataSetChanged();
+        });
+        //Create list display.
+        this.view.goalList.setAdapter(listAdapter);
+
+
+        this.mainViewModel.getCurrentDateString().observe(str -> {
             if (str == null) return;
             view.dateDebugText.setText(str);
         });
 
-        view.dateAdvanceButton.setOnClickListener(v -> activityModel.advance24Hours());
+        view.dateAdvanceButton.setOnClickListener(v -> this.mainViewModel.advance24Hours());
+
 
         setContentView(view.getRoot());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        var itemId = item.getItemId();
+
+        if(itemId == R.id.add_goal_menu){
+            //probably refactor into its own method later
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //Necessary for testing.
+    public GoalListAdapter getListAdapter() {
+        return listAdapter;
     }
 }
