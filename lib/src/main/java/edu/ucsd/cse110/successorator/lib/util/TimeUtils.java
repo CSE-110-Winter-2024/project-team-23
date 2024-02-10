@@ -9,6 +9,7 @@ public class TimeUtils {
     // So we shouldn't worry about edge cases relating to it
     public final static long DAY_LENGTH = 1000L * 60 * 60 * 24;
     public final static long HOUR_LENGTH = 1000L * 60 * 60;
+    public final static long MINUTE_LENGTH = 1000L * 60;
     public final static TimeZone GMT = TimeZone.getTimeZone("GMT");
     public final static long START_TIME = getStartTime();
 

@@ -24,8 +24,19 @@ public class MockGoalRepository implements GoalRepository {
             new Goal(8, "Goal 8; should be visible now and in 24", 8, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11)
     );
 
+
+    private final static List<Goal> US7_TEST_GOALS = List.of(
+            new Goal(1, "Goal 1", 1, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH),
+            new Goal(2, "Goal 2", 2, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 2),
+            new Goal(3, "Goal 3", 3, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 3)
+    );
+
     public static MockGoalRepository createWithDefaultGoals() {
         return new MockGoalRepository(DEFAULT_GOALS);
+    }
+
+    public static MockGoalRepository createWithUS7TestGoals() {
+        return new MockGoalRepository(US7_TEST_GOALS);
     }
 
     public MockGoalRepository(List<Goal> goals) {

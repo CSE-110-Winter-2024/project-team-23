@@ -7,7 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.List;
 
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
@@ -174,6 +176,90 @@ public class MainViewModelTest {
         }
         assertEquals(8, (int) completeGoalsToDisplay.get(0).id());
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 2);
+        // Verify that no goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(0, completeGoalsToDisplay.size());
+    }
+
+
+    @Test
+    public void US7Scenario1() {
+        // Since our standard start time is 4pm, move to 10:30
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 6 + TimeUtils.MINUTE_LENGTH * 30);
+        var US7GoalRepository = MockGoalRepository.createWithUS7TestGoals();
+        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
+        // Verify that all 3 goals are visible
+        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Move to 11:30
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 7 + TimeUtils.MINUTE_LENGTH * 30);
+        // simulate closing the app by creating a new mainViewModel
+        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
+        // Verify that all 3 goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Move to 1:30 next day
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9 + TimeUtils.MINUTE_LENGTH * 30);
+        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
+        // Verify that all 3 goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Wait another hour
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 10 + TimeUtils.MINUTE_LENGTH * 30);
+        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
+        // Verify that no goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(0, completeGoalsToDisplay.size());
+    }
+
+    @Test
+    public void US7Scenario2() {
+        // We assume the app is open the whole time now
+        var US7GoalRepository = MockGoalRepository.createWithUS7TestGoals();
+        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
+        // Since our standard start time is 4pm, move to 10:30
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 6 + TimeUtils.MINUTE_LENGTH * 30);
+        // Verify that all 3 goals are visible
+        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Move to 11:30
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 7 + TimeUtils.MINUTE_LENGTH * 30);
+        // Verify that all 3 goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Move to 1:30 next day
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9 + TimeUtils.MINUTE_LENGTH * 30);
+        // Verify that all 3 goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        for (int id = 1; id <= 3; id++) {
+            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
+        }
+        // Wait another hour
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 10 + TimeUtils.MINUTE_LENGTH * 30);
         // Verify that no goals are visible
         completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertNotNull(completeGoalsToDisplay);
