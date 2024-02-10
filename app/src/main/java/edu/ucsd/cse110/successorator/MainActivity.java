@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         this.mainViewModel = modelProvider.get(MainViewModel.class);
 
         //Initialize list adapter
-        this.listAdapter = new GoalListAdapter(this.getApplicationContext(), List.of());
+        this.listAdapter = new GoalListAdapter(this.getApplicationContext(), List.of(), mainViewModel);
         mainViewModel.getIncompleteGoals().observe(goals -> {
             if (goals == null) return;
             listAdapter.clear();
@@ -50,7 +51,18 @@ public class MainActivity extends AppCompatActivity {
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
 
+        view.goalList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                System.out.println("Position:" + position);
+                System.out.println("ID: " + id);
+                mainViewModel.pressGoal(Math.toIntExact(id));
+
+            }
+        });
+
         setContentView(view.getRoot());
+
     }
 
     @Override

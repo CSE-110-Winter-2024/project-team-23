@@ -75,13 +75,17 @@ public class MainViewModel extends ViewModel {
     public void pressGoal(int goalId) {
         var goalSubject = this.goalRepository.find(goalId);
         var goal = goalSubject.getValue();
+        System.out.println("Before Changes: " + goal.completed());
         if (goal == null) return;
         if (goal.completed()) {
             goalRepository.update(goal.markIncomplete());
+
         } else {
             // TODO: use mock date. Can't test date handling (completedGoalsToDisplay) until that's there
             goalRepository.update(goal.markComplete(new java.util.Date()));
+
         }
+        System.out.println("After: " + goal.completed());
     }
 
     public Subject<List<Goal>> getIncompleteGoals() {
