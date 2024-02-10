@@ -11,16 +11,15 @@ import java.util.Calendar;
 
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
-import edu.ucsd.cse110.successorator.lib.domain.DateOffset;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class SuccessoratorApplication extends Application {
     private GoalRepository goalRepository;
-    private MutableSubject<DateOffset> dateOffset;
+    private MutableSubject<Long> dateOffset;
     // Ticks every second; useful for propagating time updates to the app
-    private MutableSubject<Object> dateTicker;
+    private MutableSubject<Long> dateTicker;
 
     @Override
     public void onCreate() {
@@ -36,17 +35,17 @@ public class SuccessoratorApplication extends Application {
 
         this.goalRepository = new RoomGoalRepository(database.goalDao());
 
-        var dateOffset = new DateOffset(0, Calendar.getInstance());
-        this.dateOffset = new SimpleSubject<>();
+        Long dateOffset = 0L;
+        this.dateOffset = new SimpleSubject<Long>();
         this.dateOffset.setValue(dateOffset);
 
-        this.dateTicker = new SimpleSubject<>();
+        this.dateTicker = new SimpleSubject<Long>();
 
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable updateDateTask = new Runnable() {
             @Override
             public void run() {
-                dateTicker.setValue(null);
+                dateTicker.setValue(System.currentTimeMillis());
                 handler.postDelayed(this, 1000);
             }
         };
@@ -58,11 +57,11 @@ public class SuccessoratorApplication extends Application {
         return goalRepository;
     }
 
-    public MutableSubject<DateOffset> getDateOffset() {
+    public MutableSubject<Long> getDateOffset() {
         return dateOffset;
     }
 
-    public MutableSubject<Object> getDateTicker() {
+    public MutableSubject<Long> getDateTicker() {
         return dateTicker;
     }
 }

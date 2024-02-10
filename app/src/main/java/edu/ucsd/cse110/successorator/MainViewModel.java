@@ -6,10 +6,9 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import edu.ucsd.cse110.successorator.lib.domain.DateOffset;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,10 +26,12 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<List<Goal>> completedGoals;
     private final MutableSubject<List<Goal>> completeGoalsToDisplay;
     private final MutableSubject<List<Goal>> incompleteGoals;
-    private final MutableSubject<DateOffset> dateOffset;
-    private final MutableSubject<Object> dateTicker;
-    private final MutableSubject<Date> currentDate;
+    private final MutableSubject<Long> dateOffset;
+    private final MutableSubject<Long> currentRealDate;
+    private final MutableSubject<Long> currentDate;
     private final MutableSubject<Calendar> currentDateLocalized;
+    private final MutableSubject<String> currentDateString;
+    private final Calendar dateConverter;
 
     public static final ViewModelInitializer<MainViewModel> initializer = new ViewModelInitializer<>(MainViewModel.class, creationExtras -> {
         var app = (SuccessoratorApplication) creationExtras.get(APPLICATION_KEY);
@@ -41,22 +42,40 @@ public class MainViewModel extends ViewModel {
     /**
      * @param goalRepository storage for goals
      * @param offset         offset for the date as configured by the user1
-     * @param dateTicker     used to communicate time updates to the app
+     * @param currentRealDate    how the app knows what time it is
      * @param dateConverter  This is specifically used to convert Dates to normal representations (e.g. for display, so we know when 2am is). This is because time zones are hard. During testing we'll pass in a Calendar with a fixed time zone, because we don't want tests flaking depending on where the actions runner is located. We can't use a mock calendar class here becuase we need Calendar to do time zone handling for us; implementing time zones ourselves is inadvisable.
      */
-    public MainViewModel(GoalRepository goalRepository, MutableSubject<DateOffset> offset, MutableSubject<Object> dateTicker, Calendar dateConverter) {
+    public MainViewModel(GoalRepository goalRepository, MutableSubject<Long> offset, MutableSubject<Long> currentRealDate, Calendar dateConverter) {
         this.goalRepository = goalRepository;
         this.dateOffset = offset;
-        this.dateTicker = dateTicker;
+        this.currentRealDate = currentRealDate;
+        this.dateConverter = dateConverter;
 
         this.currentDate = new SimpleSubject<>();
-        this.currentDate.setValue(dateOffset.getValue().now());
-        this.dateOffset.observe(newOffset -> currentDate.setValue(newOffset.now()));
-        this.dateTicker.observe(tick -> currentDate.setValue(dateOffset.getValue().now()));
         this.currentDateLocalized = new SimpleSubject<>();
-        this.currentDate.observe(date -> {
+        this.currentDateString = new SimpleSubject<>();
+
+        this.dateOffset.observe(offsetValue -> {
+            if (offsetValue == null) return;
+            Long currentTime = this.currentRealDate.getValue();
+            if (currentTime == null) return;
+            this.currentDate.setValue(currentTime + offsetValue);
+        });
+        this.currentRealDate.observe(date -> {
             if (date == null) return;
-            currentDateLocalized.setValue(localize(date, dateConverter));
+            Long dateOffset = this.dateOffset.getValue();
+            if (dateOffset == null) return;
+            this.currentDate.setValue(date + dateOffset);
+        });
+        this.currentDate.observe(currentTime -> {
+            if (currentTime == null) return;
+            this.currentDateLocalized.setValue(localize(currentTime, dateConverter));
+        });
+        this.currentDateLocalized.observe(localized -> {
+            if (localized == null) return;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            formatter.setCalendar(dateConverter);
+            this.currentDateString.setValue(formatter.format(localized.getTime()));
         });
 
         this.orderedGoals = new SimpleSubject<>();
@@ -84,7 +103,8 @@ public class MainViewModel extends ViewModel {
 
         this.completedGoals.observe(completedGoals -> {
             if (completedGoals == null) return;
-            var nowLocalized = localize(dateOffset.getValue().now(), dateConverter);
+            var nowLocalized = currentDateLocalized.getValue();
+            if (nowLocalized == null) return;
             var nowDay = nowLocalized.get(Calendar.DAY_OF_YEAR);
             var nowHour = nowLocalized.get(Calendar.HOUR_OF_DAY);
             // Filter the goals
@@ -113,21 +133,17 @@ public class MainViewModel extends ViewModel {
     }
 
     public void advance24Hours() {
-        DateOffset offset = dateOffset.getValue();
+        Long offset = dateOffset.getValue();
         if (offset == null) {
             return;
         }
 
-        offset = offset.addDay();
+        offset += 24 * 60 * 60 * 1000;
         dateOffset.setValue(offset);
     }
 
-    public Subject<Date> getCurrentDate() {
-        return currentDate;
-    }
-
-    public Subject<Calendar> getCurrentDateLocalized() {
-        return currentDateLocalized;
+    public Subject<String> getCurrentDateString() {
+        return currentDateString;
     }
 
     public void pressGoal(int goalId) {
@@ -137,12 +153,9 @@ public class MainViewModel extends ViewModel {
         if (goal.completed()) {
             goalRepository.update(goal.markIncomplete());
         } else {
-            var offset = dateOffset.getValue();
-            if (offset == null) return;
-            // Alternatively can use currentTime, but I view that more of a way to propagate events
-            // as opposed to a good single source of truth for time, since the Handler could get
-            // paused or something, and I want the app to not fully fail in that case
-            goalRepository.update(goal.markComplete(offset.now()));
+            var currentDate = this.currentRealDate.getValue();
+            if (currentDate == null) return;
+            goalRepository.update(goal.markComplete(currentDate));
         }
     }
 
@@ -157,12 +170,15 @@ public class MainViewModel extends ViewModel {
     public void addGoal(String contents) {
         // We could use a proper value for the completion date, but we don't really care about it
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
-        var newGoal = new Goal(null, contents, 0, false, new java.util.Date());
+        var currentTime = this.currentDate.getValue();
+        if (currentTime == null) return;
+        var newGoal = new Goal(null, contents, 0, false, currentTime);
         goalRepository.append(newGoal);
     }
 
-    private static Calendar localize(Date date, Calendar dateConverter) {
-        if (date == null) return null;
+    private static Calendar localize(Long currentTime, Calendar dateConverter) {
+        if (currentTime == null) return null;
+        Date date = new Date(currentTime);
         Calendar localized = (Calendar) dateConverter.clone();
         localized.setTime(date);
         return localized;

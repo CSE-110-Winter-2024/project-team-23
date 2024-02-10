@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import edu.ucsd.cse110.successorator.lib.domain.DateOffset;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.MockCalendar;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
@@ -18,8 +17,8 @@ import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class MainViewModelTest {
     GoalRepository goalRepository;
-    MutableSubject<DateOffset> dateOffset;
-    MutableSubject<Object> dateTicker;
+    MutableSubject<Long> dateOffset;
+    MutableSubject<Long> dateTicker;
     MockCalendar mockCalendar;
     Calendar localizedCalendar;
     MainViewModel mainViewModel;
@@ -28,9 +27,9 @@ public class MainViewModelTest {
     public void setUp() {
         goalRepository = MockGoalRepository.createWithDefaultGoals();
         mockCalendar = new MockCalendar(MockGoalRepository.START_TIME);
-        dateOffset = new SimpleSubject<>();
-        dateOffset.setValue(new DateOffset(0, mockCalendar));
-        dateTicker = new SimpleSubject<>();
+        dateOffset = new SimpleSubject<Long>();
+        dateOffset.setValue(0);
+        dateTicker = new SimpleSubject<Long>();
         dateTicker.setValue(null);
         localizedCalendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);

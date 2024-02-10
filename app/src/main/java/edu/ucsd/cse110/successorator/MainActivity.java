@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
         var modelProvider = new ViewModelProvider(this, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
-        activityModel.getCurrentDate().observe(date -> {
-            if (date == null) return;
-            view.dateDebugText.setText(date.toString());
+        activityModel.getCurrentDateString().observe(str -> {
+            if (str == null) return;
+            view.dateDebugText.setText(str);
         });
 
         view.dateAdvanceButton.setOnClickListener(v -> activityModel.advance24Hours());
