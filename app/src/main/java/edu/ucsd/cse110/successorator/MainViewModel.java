@@ -70,11 +70,14 @@ public class MainViewModel extends ViewModel {
         });
     }
 
-    public void pressComplete(Goal goal) {
+    public void pressGoal(int goalId) {
+        var goalSubject = this.goalRepository.find(goalId);
+        var goal = goalSubject.getValue();
+        if (goal == null) return;
         if (goal.completed()) {
             goalRepository.update(goal.markIncomplete());
         } else {
-            // TODO: use mock date
+            // TODO: use mock date. Can't test date handling (completedGoalsToDisplay) until that's there
             goalRepository.update(goal.markComplete(new java.util.Date()));
         }
     }
@@ -83,6 +86,7 @@ public class MainViewModel extends ViewModel {
         return incompleteGoals;
     }
 
+    // TODO: test this; depends on mock date
     public Subject<List<Goal>> getCompleteGoalsToDisplay() {
         return completeGoalsToDisplay;
     }
