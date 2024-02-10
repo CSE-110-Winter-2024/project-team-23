@@ -1,10 +1,11 @@
 package edu.ucsd.cse110.successorator.data.db;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import java.util.Date;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
@@ -21,23 +22,27 @@ public class GoalEntity {
     public int sortOrder;
 
     @ColumnInfo(name = "completed")
-    public boolean completed = false;
+    public boolean completed;
+
+    @ColumnInfo(name = "completionDate")
+    public long completionDate;
 
     public GoalEntity(@NonNull String content, int sortOrder,
-                      boolean completed) {
+                      boolean completed, long  completionDate) {
         this.content = content;
         this.sortOrder = sortOrder;
         this.completed = completed;
+        this.completionDate = completionDate;
     }
 
     public static GoalEntity fromGoal(Goal goal) {
         GoalEntity goalEntity = new GoalEntity(goal.content(), goal.sortOrder(),
-                goal.completed());
+                goal.completed(), goal.completionDate().getTime());
         goalEntity.id = goal.id();
         return goalEntity;
     }
 
     public Goal toGoal() {
-        return new Goal(id, content, sortOrder, completed);
+        return new Goal(id, content, sortOrder, completed, new Date(completionDate));
     }
 }
