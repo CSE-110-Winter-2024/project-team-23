@@ -2,11 +2,14 @@ package edu.ucsd.cse110.successorator;
 
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
+import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -23,5 +26,17 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_bar, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        var itemId = item.getItemId();
+
+        if(itemId == R.id.add_goal_menu){
+            //probably refactor into its own method later
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
+            dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
