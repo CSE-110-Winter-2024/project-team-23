@@ -50,21 +50,18 @@ public class MainActivity extends AppCompatActivity {
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
 
-
-        this.mainViewModel.getCurrentDateString().observe(str -> {
-            if (str == null) return;
-            view.dateDebugText.setText(str);
-        });
-
-        view.dateAdvanceButton.setOnClickListener(v -> this.mainViewModel.advance24Hours());
-
-
         setContentView(view.getRoot());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_bar, menu);
+
+        this.mainViewModel.getCurrentDateString().observe(str -> {
+            if (str == null) return;
+            String paddedString = "                 " + str + "                 ";
+            menu.findItem(R.id.top_bar_text).setTitle(paddedString);
+        });
         return true;
     }
 
@@ -72,10 +69,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         var itemId = item.getItemId();
 
-        if(itemId == R.id.add_goal_menu){
+        if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+        } else if (itemId == R.id.advance_time_menu) {
+            this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
     }
