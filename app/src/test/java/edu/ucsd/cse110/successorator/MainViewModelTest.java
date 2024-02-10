@@ -15,6 +15,7 @@ public class MainViewModelTest {
         MainViewModel mainViewModel = new MainViewModel(MockGoalRepository.createWithDefaultGoals());
 
         mainViewModel.pressGoal(1);
+        // TODO: use mocked calendar to test complete date setting
         // Verify that goal IDs 2, 3 are in the incomplete goals list and ids 1, 4, 5, 6 are not
         assertTrue(mainViewModel.getIncompleteGoals().getValue().get(0).id() == 2);
         assertTrue(mainViewModel.getIncompleteGoals().getValue().get(1).id() == 3);
