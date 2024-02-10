@@ -6,6 +6,8 @@ import android.os.Looper;
 
 import androidx.room.Room;
 
+import java.util.Calendar;
+
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
 import edu.ucsd.cse110.successorator.lib.domain.DateOffset;
@@ -33,7 +35,7 @@ public class SuccessoratorApplication extends Application {
 
         this.goalRepository = new RoomGoalRepository(database.goalDao());
 
-        var dateOffset = new DateOffset(0);
+        var dateOffset = new DateOffset(0, Calendar.getInstance());
         this.dateOffset = new SimpleSubject<>();
         this.dateOffset.setValue(dateOffset);
 

@@ -8,9 +8,11 @@ import java.util.Date;
  */
 public class DateOffset {
     private final long seconds;
+    private final Calendar calendar;
 
-    public DateOffset(long offset) {
+    public DateOffset(long offset, Calendar calendar) {
         this.seconds = offset;
+        this.calendar = calendar;
     }
 
     public long getSeconds() {
@@ -18,7 +20,7 @@ public class DateOffset {
     }
 
     public DateOffset add(long seconds) {
-        return new DateOffset(this.seconds + seconds);
+        return new DateOffset(this.seconds + seconds, this.calendar);
     }
 
     public DateOffset addDay() {
@@ -30,8 +32,7 @@ public class DateOffset {
         // https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
         // Used below link to add to time
         // https://stackoverflow.com/questions/3581258/adding-n-hours-to-a-date-in-java
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, (int) seconds);
-        return cal.getTime();
+        var millis = calendar.getTimeInMillis();
+        return new Date(millis + seconds * 1000);
     }
 }
