@@ -7,8 +7,6 @@ import android.os.Looper;
 import androidx.room.Room;
 
 
-import java.util.Calendar;
-
 import edu.ucsd.cse110.successorator.data.db.RoomGoalRepository;
 import edu.ucsd.cse110.successorator.data.db.SuccessoratorDatabase;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
@@ -18,8 +16,7 @@ import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 public class SuccessoratorApplication extends Application {
     private GoalRepository goalRepository;
     private MutableSubject<Long> dateOffset;
-    // Ticks every second; useful for propagating time updates to the app
-    private MutableSubject<Long> dateTicker;
+    private MutableSubject<Long> currentRealTime;
 
     @Override
     public void onCreate() {
@@ -36,16 +33,18 @@ public class SuccessoratorApplication extends Application {
         this.goalRepository = new RoomGoalRepository(database.goalDao());
 
         Long dateOffset = 0L;
-        this.dateOffset = new SimpleSubject<Long>();
+        this.dateOffset = new SimpleSubject<>();
         this.dateOffset.setValue(dateOffset);
 
-        this.dateTicker = new SimpleSubject<Long>();
+        this.currentRealTime = new SimpleSubject<>();
+
+        currentRealTime.setValue(System.currentTimeMillis());
 
         Handler handler = new Handler(Looper.getMainLooper());
         Runnable updateDateTask = new Runnable() {
             @Override
             public void run() {
-                dateTicker.setValue(System.currentTimeMillis());
+                currentRealTime.setValue(System.currentTimeMillis());
                 handler.postDelayed(this, 1000);
             }
         };
@@ -61,7 +60,7 @@ public class SuccessoratorApplication extends Application {
         return dateOffset;
     }
 
-    public MutableSubject<Long> getDateTicker() {
-        return dateTicker;
+    public MutableSubject<Long> getCurrentRealTime() {
+        return currentRealTime;
     }
 }

@@ -8,7 +8,7 @@ public class Goal {
     private final @NonNull String content;
     private final int sortOrder;
     private final boolean completed;
-    private final @NonNull long completionDate;
+    private final @NonNull Long completionDate;
 
     //Constructors
     public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
@@ -37,7 +37,7 @@ public class Goal {
 
 
     //Accessor Methods
-    public @Nullable Integer id() {
+    public Integer id() {
         return id;
     }
 

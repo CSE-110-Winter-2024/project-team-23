@@ -1,30 +1,27 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
+import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 
 public class MockGoalRepository implements GoalRepository {
     private final List<MutableSubject<Goal>> goals;
     private final MutableSubject<List<Goal>> goalSubject;
 
-    // Somewhat arbitrary value for the start time; our code will never run around 0
-    // So we shouldn't worry about edge cases relating to it
-    public final static long DAY_LENGTH = 1000L * 60 * 60 * 24;
-    public final static long START_TIME = DAY_LENGTH * 365 * 10;
-
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "Goal 1", 1, false, START_TIME),
-            new Goal(2, "Goal 2", 2, false, START_TIME + DAY_LENGTH),
-            new Goal(3, "Goal 3", 3, false, START_TIME + DAY_LENGTH * 2),
-            new Goal(4, "Goal 4", 4, true, START_TIME),
-            new Goal(5, "Goal 5", 5, true, START_TIME + DAY_LENGTH),
-            new Goal(6, "Goal 6", 6, true, START_TIME + DAY_LENGTH * 2)
+            new Goal(1, "Goal 1", 1, false, 0),
+            new Goal(2, "Goal 2", 2, false, 0),
+            new Goal(3, "Goal 3", 3, false, 0),
+            new Goal(4, "Goal 4; should not be visible now and in 24", 4, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 15),
+            new Goal(5, "Goal 5; should be visible now but not in 24", 5, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 13),
+            new Goal(6, "Goal 6; should be visible now but not in 24", 6, true, TimeUtils.START_TIME),
+            new Goal(7, "Goal 7; should be visible now but not in 24", 7, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9),
+            new Goal(8, "Goal 8; should be visible now and in 24", 8, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11)
     );
 
     public static MockGoalRepository createWithDefaultGoals() {

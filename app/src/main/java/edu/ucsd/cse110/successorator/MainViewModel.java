@@ -8,10 +8,10 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
@@ -19,6 +19,7 @@ import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
+import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 
 public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepository;
@@ -36,7 +37,7 @@ public class MainViewModel extends ViewModel {
     public static final ViewModelInitializer<MainViewModel> initializer = new ViewModelInitializer<>(MainViewModel.class, creationExtras -> {
         var app = (SuccessoratorApplication) creationExtras.get(APPLICATION_KEY);
         assert app != null;
-        return new MainViewModel(app.getGoalRepository(), app.getDateOffset(), app.getDateTicker(), Calendar.getInstance());
+        return new MainViewModel(app.getGoalRepository(), app.getDateOffset(), app.getCurrentRealTime(), Calendar.getInstance());
     });
 
     /**
@@ -69,11 +70,11 @@ public class MainViewModel extends ViewModel {
         });
         this.currentDate.observe(currentTime -> {
             if (currentTime == null) return;
-            this.currentDateLocalized.setValue(localize(currentTime, dateConverter));
+            this.currentDateLocalized.setValue(TimeUtils.localize(currentTime, dateConverter));
         });
         this.currentDateLocalized.observe(localized -> {
             if (localized == null) return;
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
             formatter.setCalendar(dateConverter);
             this.currentDateString.setValue(formatter.format(localized.getTime()));
         });
@@ -105,31 +106,32 @@ public class MainViewModel extends ViewModel {
             if (completedGoals == null) return;
             var nowLocalized = currentDateLocalized.getValue();
             if (nowLocalized == null) return;
-            var nowDay = nowLocalized.get(Calendar.DAY_OF_YEAR);
-            var nowHour = nowLocalized.get(Calendar.HOUR_OF_DAY);
             // Filter the goals
             var completeGoalsToDisplay = completedGoals.stream().filter(goal -> {
                 // Display goals that were completed after 2am today if it's after 2am
                 // Otherwise, display goals completed after 2am yesterday
-                var goalLocalized = localize(goal.completionDate(), dateConverter);
-                var goalDay = goalLocalized.get(Calendar.DAY_OF_YEAR);
-                var goalHour = goalLocalized.get(Calendar.HOUR_OF_DAY);
-                return shouldShowGoal(nowDay, nowHour, goalDay, goalHour);
+                var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
+                return TimeUtils.shouldShowGoal(goalLocalized, nowLocalized);
             }).collect(Collectors.toList());
 
             this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
         });
-    }
 
-    /**
-     * Some weirdness here: I think it should show goals created in the future, but I'm not sure.
-     */
-    private static boolean shouldShowGoal(int nowDay, int nowHour, int goalDay, int goalHour) {
-        if (nowHour >= 2) {
-            return goalDay == nowDay && goalHour >= 2 || goalDay >= nowDay + 1;
-        } else {
-            return (goalDay == nowDay - 1 && goalHour >= 2) || goalDay >= nowDay;
-        }
+        this.currentDateLocalized.observe(nowLocalized -> {
+            if (nowLocalized == null) return;
+            var completedGoals = this.completedGoals.getValue();
+            if (completedGoals == null) return;
+            // Filter the goals
+            var completeGoalsToDisplay = completedGoals.stream().filter(goal -> {
+                // Display goals that were completed after 2am today if it's after 2am
+                // Otherwise, display goals completed after 2am yesterday
+                var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
+                return TimeUtils.shouldShowGoal(goalLocalized, nowLocalized);
+            }).collect(Collectors.toList());
+
+            this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
+        });
+
     }
 
     public void advance24Hours() {
@@ -176,11 +178,7 @@ public class MainViewModel extends ViewModel {
         goalRepository.append(newGoal);
     }
 
-    private static Calendar localize(Long currentTime, Calendar dateConverter) {
-        if (currentTime == null) return null;
-        Date date = new Date(currentTime);
-        Calendar localized = (Calendar) dateConverter.clone();
-        localized.setTime(date);
-        return localized;
+    public Calendar getDateConverter() {
+        return dateConverter;
     }
 }
