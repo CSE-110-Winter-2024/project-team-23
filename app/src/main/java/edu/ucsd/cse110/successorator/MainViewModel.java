@@ -82,9 +82,13 @@ public class MainViewModel extends ViewModel {
         });
         this.currentDateLocalized.observe(localized -> {
             if (localized == null) return;
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
+            var displayDate = (Calendar) localized.clone();
+            if (displayDate.get(Calendar.HOUR_OF_DAY) < 2) {
+                displayDate.add(Calendar.DAY_OF_YEAR, -1);
+            }
+            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMMM", Locale.US);
             formatter.setCalendar(dateConverter);
-            this.currentDateString.setValue(formatter.format(localized.getTime()));
+            this.currentDateString.setValue(formatter.format(displayDate.getTime()));
         });
 
         this.orderedGoals = new SimpleSubject<>();

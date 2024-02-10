@@ -8,20 +8,4 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         android:title="Add Goal"
         app:iconTint="@color/white"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/top_bar_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checkable="false"
-        android:orderInCategory="1"
-        android:title="a"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/advance_time_menu"
-        android:icon="@android:drawable/ic_media_ff"
-        android:orderInCategory="0"
-        android:title="Advance time"
-        app:iconTint="@color/white"
-        app:showAsAction="always" />
 </menu>

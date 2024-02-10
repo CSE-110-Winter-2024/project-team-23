@@ -2,6 +2,7 @@ package edu.ucsd.cse110.successorator;
 
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,10 +58,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_bar, menu);
 
+        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         this.mainViewModel.getCurrentDateString().observe(str -> {
             if (str == null) return;
-            String paddedString = "                 " + str + "                 ";
-            menu.findItem(R.id.top_bar_text).setTitle(paddedString);
+            getSupportActionBar().setTitle(str);
         });
         return true;
     }
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             //probably refactor into its own method later
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
-        } else if (itemId == R.id.advance_time_menu) {
+        } else if (itemId == android.R.id.home) {
             this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
