@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class MockCalendar extends Calendar {
     private long time;
-    MockCalendar(long time) {
+    public MockCalendar(long time) {
         this.time = time;
     }
 

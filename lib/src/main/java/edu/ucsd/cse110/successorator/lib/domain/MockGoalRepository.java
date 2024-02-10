@@ -13,13 +13,18 @@ public class MockGoalRepository implements GoalRepository {
     private final List<MutableSubject<Goal>> goals;
     private final MutableSubject<List<Goal>> goalSubject;
 
+    // Somewhat arbitrary value for the start time; our code will never run around 0
+    // So we shouldn't worry about edge cases relating to it
+    public final static long DAY_LENGTH = 1000L * 60 * 60 * 24;
+    public final static long START_TIME = DAY_LENGTH * 365 * 10;
+
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "Goal 1", 1, false, new Date(0)),
-            new Goal(2, "Goal 2", 2, false, new Date(1000 * 60 * 60 * 24)),
-            new Goal(3, "Goal 3", 3, false, new Date(1000 * 60 * 60 * 24 * 2)),
-            new Goal(4, "Goal 4", 4, true, new Date(0)),
-            new Goal(5, "Goal 5", 5, true, new Date(1000 * 60 * 60 * 24)),
-            new Goal(6, "Goal 6", 6, true, new Date(1000 * 60 * 60 * 24 * 2))
+            new Goal(1, "Goal 1", 1, false, new Date(START_TIME)),
+            new Goal(2, "Goal 2", 2, false, new Date(START_TIME + DAY_LENGTH)),
+            new Goal(3, "Goal 3", 3, false, new Date(START_TIME + DAY_LENGTH * 2)),
+            new Goal(4, "Goal 4", 4, true, new Date(START_TIME)),
+            new Goal(5, "Goal 5", 5, true, new Date(START_TIME + DAY_LENGTH)),
+            new Goal(6, "Goal 6", 6, true, new Date(START_TIME + DAY_LENGTH * 2))
     );
 
     public static MockGoalRepository createWithDefaultGoals() {
