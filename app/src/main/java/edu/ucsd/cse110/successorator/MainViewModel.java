@@ -47,6 +47,14 @@ public class MainViewModel extends ViewModel {
      * @param dateConverter  This is specifically used to convert Dates to normal representations (e.g. for display, so we know when 2am is). This is because time zones are hard. During testing we'll pass in a Calendar with a fixed time zone, because we don't want tests flaking depending on where the actions runner is located. We can't use a mock calendar class here becuase we need Calendar to do time zone handling for us; implementing time zones ourselves is inadvisable.
      */
     public MainViewModel(GoalRepository goalRepository, MutableSubject<Long> offset, MutableSubject<Long> currentRealDate, Calendar dateConverter) {
+        // How dates work in this app:
+        // dateTicker is a subject that emits the current time every second
+        // this is how the app actually knows what time it is
+        // dateOffset is a subject that emits the offset from the current time
+        // this is the offset that should be user-configurable
+        // from these two we derive currentDate, which is the time that the app should use for all its calculations
+        // currentDateLocalized is the localized version of currentDate, either using the timezone of the device or GMT during tests
+        // currentDateString is the string representation of currentDateLocalized, this should be modified for US2
         this.goalRepository = goalRepository;
         this.dateOffset = offset;
         this.currentRealDate = currentRealDate;
