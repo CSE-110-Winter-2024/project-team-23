@@ -63,6 +63,16 @@ public class MockGoalRepository implements GoalRepository {
     }
 
     @Override
+    public Goal findGoal(int id) {
+        for (var goal : goals) {
+            if (goal.getValue().id() == id) {
+                return goal.getValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
     public Subject<List<Goal>> findAll() {
         return goalSubject;
     }

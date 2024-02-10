@@ -161,9 +161,10 @@ public class MainViewModel extends ViewModel {
     }
 
     public void pressGoal(int goalId) {
-        var goalSubject = this.goalRepository.find(goalId);
-        var goal = goalSubject.getValue();
-        if (goal == null) return;
+        var goal = goalRepository.findGoal(goalId);
+        if (goal == null) {
+            return;
+        };
         if (goal.completed()) {
             goalRepository.update(goal.markIncomplete());
         } else {
