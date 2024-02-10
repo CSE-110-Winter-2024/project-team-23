@@ -59,6 +59,5 @@ public class MainViewModelTest {
         mainViewModel.addGoal("Goal 7");
         // Verify that the new goal is in the incomplete goals list
         assertTrue(mainViewModel.getIncompleteGoals().getValue().get(3).id() == 7);
-
     }
 }
