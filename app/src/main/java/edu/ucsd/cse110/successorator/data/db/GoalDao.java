@@ -43,7 +43,7 @@ public interface GoalDao {
     default int append(GoalEntity goal) {
         int maxSortOrder = getMaxSortOrder();
         GoalEntity newGoal = new GoalEntity(goal.content, maxSortOrder + 1,
-                false);
+                false, goal.completionDate);
         return Math.toIntExact(insert(newGoal));
     }
 
@@ -51,7 +51,7 @@ public interface GoalDao {
     default int prepend(GoalEntity goal) {
         shiftSortOrder(getMinSortOrder(), getMaxSortOrder(), 1);
         GoalEntity newGoal = new GoalEntity(goal.content, getMinSortOrder() - 1,
-                false);
+                false, goal.completionDate);
         return Math.toIntExact(insert(newGoal));
     }
 
