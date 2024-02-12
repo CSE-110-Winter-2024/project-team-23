@@ -17,12 +17,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
+import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
+import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
 /**
@@ -35,7 +38,14 @@ public class MainActivityTest {
     @Test
     public void listDisplaysDatabase() {
         try (var scenario = ActivityScenario.launch(MainActivity.class)) {
-            MainViewModel mainViewModel = new MainViewModel(MockGoalRepository.createWithDefaultGoals());
+
+            var goalRepository = MockGoalRepository.createWithDefaultGoals();
+            var dateOffset = new SimpleSubject<Long>();
+            dateOffset.setValue(0L);
+            var dateTicker = new SimpleSubject<Long>();
+            dateTicker.setValue(TimeUtils.START_TIME);
+            var localizedCalendar = Calendar.getInstance(TimeUtils.GMT);
+            var mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
             // Observe the scenario's lifecycle to wait until the activity is created.
             scenario.onActivity(activity -> {

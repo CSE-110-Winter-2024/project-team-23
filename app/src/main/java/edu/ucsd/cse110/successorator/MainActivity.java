@@ -2,6 +2,7 @@ package edu.ucsd.cse110.successorator;
 
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +57,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_bar, menu);
+
+        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        this.mainViewModel.getCurrentDateString().observe(str -> {
+            if (str == null) return;
+            getSupportActionBar().setTitle(str);
+        });
         return true;
     }
 
@@ -63,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         var itemId = item.getItemId();
 
-        if(itemId == R.id.add_goal_menu){
+        if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+        } else if (itemId == android.R.id.home) {
+            this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
     }

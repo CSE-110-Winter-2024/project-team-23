@@ -3,18 +3,16 @@ package edu.ucsd.cse110.successorator.lib.domain;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Date;
-
 public class Goal {
     private final @Nullable Integer id;
     private final @NonNull String content;
     private final int sortOrder;
     private final boolean completed;
-    private final @NonNull Date completionDate;
+    private final @NonNull Long completionDate;
 
     //Constructors
     public Goal(@Nullable Integer id, @NonNull String content, int sortOrder,
-                boolean completed, @NonNull Date completionDate) {
+                boolean completed, long completionDate) {
         this.id = id;
         this.content = content;
         this.sortOrder = sortOrder;
@@ -28,7 +26,7 @@ public class Goal {
         return new Goal(id, content, sortOrder, !completed, completionDate);
     }
 
-    public Goal markComplete(@NonNull Date completionDate) {
+    public Goal markComplete(@NonNull Long completionDate) {
         // We assume method won't be called if goal is already complete
         return new Goal(id, content, sortOrder, true, completionDate);
     }
@@ -39,7 +37,7 @@ public class Goal {
 
 
     //Accessor Methods
-    public @Nullable Integer id() {
+    public Integer id() {
         return id;
     }
 
@@ -55,7 +53,7 @@ public class Goal {
         return completed;
     }
 
-    public @NonNull Date completionDate() {
+    public @NonNull Long completionDate() {
         return completionDate;
     }
 }

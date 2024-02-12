@@ -1,29 +1,42 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
+import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 
 public class MockGoalRepository implements GoalRepository {
     private final List<MutableSubject<Goal>> goals;
     private final MutableSubject<List<Goal>> goalSubject;
 
     public final static List<Goal> DEFAULT_GOALS = List.of(
-            new Goal(1, "Goal 1", 1, false, new Date(0)),
-            new Goal(2, "Goal 2", 2, false, new Date(1000 * 60 * 60 * 24)),
-            new Goal(3, "Goal 3", 3, false, new Date(1000 * 60 * 60 * 24 * 2)),
-            new Goal(4, "Goal 4", 4, true, new Date(0)),
-            new Goal(5, "Goal 5", 5, true, new Date(1000 * 60 * 60 * 24)),
-            new Goal(6, "Goal 6", 6, true, new Date(1000 * 60 * 60 * 24 * 2))
+            new Goal(1, "Goal 1", 1, false, 0),
+            new Goal(2, "Goal 2", 2, false, 0),
+            new Goal(3, "Goal 3", 3, false, 0),
+            new Goal(4, "Goal 4; should not be visible now and in 24", 4, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 15),
+            new Goal(5, "Goal 5; should be visible now but not in 24", 5, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 13),
+            new Goal(6, "Goal 6; should be visible now but not in 24", 6, true, TimeUtils.START_TIME),
+            new Goal(7, "Goal 7; should be visible now but not in 24", 7, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9),
+            new Goal(8, "Goal 8; should be visible now and in 24", 8, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11)
+    );
+
+
+    private final static List<Goal> US7_TEST_GOALS = List.of(
+            new Goal(1, "Goal 1", 1, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH),
+            new Goal(2, "Goal 2", 2, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 2),
+            new Goal(3, "Goal 3", 3, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 3)
     );
 
     public static MockGoalRepository createWithDefaultGoals() {
         return new MockGoalRepository(DEFAULT_GOALS);
+    }
+
+    public static MockGoalRepository createWithUS7TestGoals() {
+        return new MockGoalRepository(US7_TEST_GOALS);
     }
 
     public MockGoalRepository(List<Goal> goals) {
@@ -47,6 +60,16 @@ public class MockGoalRepository implements GoalRepository {
         // We assume that the goal exists, but if it doesn't we return a subject with a null value.
         // This subject will NOT get updated when the goal is updated.
         return new SimpleSubject<>();
+    }
+
+    @Override
+    public Goal findGoal(int id) {
+        for (var goal : goals) {
+            if (goal.getValue().id() == id) {
+                return goal.getValue();
+            }
+        }
+        return null;
     }
 
     @Override
