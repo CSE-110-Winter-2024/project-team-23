@@ -75,8 +75,10 @@ public class MainViewModel extends ViewModel {
     public void pressGoal(int goalId) {
         var goalSubject = this.goalRepository.find(goalId);
         var goal = goalSubject.getValue();
-        System.out.println("Before Changes: " + goal.completed());
-        if (goal == null) return;
+        if (goal == null) {
+            System.out.println("NULL");
+            return;
+        }
         if (goal.completed()) {
             goalRepository.update(goal.markIncomplete());
 
