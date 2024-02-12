@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/add_goal_menu"
-        android:title="Add Goal"
+    <item
+        android:id="@+id/add_goal_menu"
         android:icon="@drawable/ic_plus"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
+        android:title="Add Goal"
         app:iconTint="@color/white"
         app:showAsAction="always" />
 </menu>

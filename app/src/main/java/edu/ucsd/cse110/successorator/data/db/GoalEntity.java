@@ -37,12 +37,12 @@ public class GoalEntity {
 
     public static GoalEntity fromGoal(Goal goal) {
         GoalEntity goalEntity = new GoalEntity(goal.content(), goal.sortOrder(),
-                goal.completed(), goal.completionDate().getTime());
+                goal.completed(), goal.completionDate());
         goalEntity.id = goal.id();
         return goalEntity;
     }
 
     public Goal toGoal() {
-        return new Goal(id, content, sortOrder, completed, new Date(completionDate));
+        return new Goal(id, content, sortOrder, completed, completionDate);
     }
 }

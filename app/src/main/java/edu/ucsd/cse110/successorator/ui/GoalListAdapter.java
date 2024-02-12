@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,9 +38,20 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
             binding = ListItemGoalBinding.inflate(layoutInflater, parent, false);
         }
 
-        binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | (goal.completed() ? 16 : 0));
+        System.out.println("aaaa");
+        System.out.println(binding.goalText.getPaintFlags());
 
         binding.goalText.setText(goal.content());
+        binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+        System.out.println(binding.goalText.getPaintFlags());
+        if (goal.completed()) {
+            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+        else {
+            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~16));
+        }
+
+
 
         return binding.getRoot();
     }

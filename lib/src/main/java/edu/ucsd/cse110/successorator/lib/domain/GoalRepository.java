@@ -6,6 +6,7 @@ import edu.ucsd.cse110.successorator.lib.util.Subject;
 
 public interface GoalRepository {
     Subject<Goal> find(int id);
+    Goal findGoal(int id);
 
     Subject<List<Goal>> findAll();
 
