@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,17 +39,18 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
             binding = ListItemGoalBinding.inflate(layoutInflater, parent, false);
         }
 
-        System.out.println("aaaa");
-        System.out.println(binding.goalText.getPaintFlags());
-
+        /*
+        Strike through reference:
+        https://stackoverflow.com/questions/3881553/is-there-an-easy-way-to-strike-through-text-in-an-app-widget/6739637
+         */
         binding.goalText.setText(goal.content());
-        binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
-        System.out.println(binding.goalText.getPaintFlags());
         if (goal.completed()) {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            binding.background.setBackgroundColor(Color.LTGRAY);
         }
         else {
-            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~16));
+            binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            binding.background.setBackgroundColor(Color.WHITE);
         }
 
 

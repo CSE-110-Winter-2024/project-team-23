@@ -164,13 +164,16 @@ public class MainViewModel extends ViewModel {
         var goal = goalRepository.findGoal(goalId);
         if (goal == null) {
             return;
-        };
+        }
         if (goal.completed()) {
-            goalRepository.update(goal.markIncomplete());
+            var newGoal = goal.markIncomplete();
+            goalRepository.update(newGoal);
         } else {
+
             var currentDate = this.currentRealDate.getValue();
             if (currentDate == null) return;
-            goalRepository.update(goal.markComplete(currentDate));
+            var newGoal = goal.markComplete(currentDate);
+            goalRepository.update(newGoal);
         }
     }
 
