@@ -153,7 +153,6 @@ public class MainViewModelTest {
         // Verify that the current date string is correct
         var currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wednesday07February040000", currentDateString);
         assertEquals("Wednesday, 07 February", currentDateString);
         // advance 9 hours and verify no change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
