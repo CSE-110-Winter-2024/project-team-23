@@ -23,7 +23,7 @@ public class Goal {
     public Goal markIncomplete() {
         // Keeping old completion date is fine; it will be overwritten
         // We assume method won't be called if goal is already incomplete
-        return new Goal(id, content, sortOrder, !completed, completionDate);
+        return new Goal(id, content, sortOrder, false, completionDate);
     }
 
     public Goal markComplete(@NonNull Long completionDate) {
@@ -34,6 +34,7 @@ public class Goal {
     public Goal withSortOrder(int sortOrder) {
         return new Goal(id, content, sortOrder, completed, completionDate);
     }
+
 
 
     //Accessor Methods
