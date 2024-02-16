@@ -147,12 +147,23 @@ public class MainViewModelTest {
     }
 
 
+    // Pretty much tests US2 scenarios 1 and 2 as well (just differnt time increments).
     @Test
     public void getCurrentDateString() {
         // Verify that the current date string is correct
         var currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wednesday07February040000", currentDateString);
+        assertEquals("Wednesday, 07 February", currentDateString);
+        // advance 9 hours and verify no change
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
+        currentDateString = mainViewModel.getCurrentDateString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Wednesday, 07 February", currentDateString);
+        // Advance another 2 and verify change
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
+        currentDateString = mainViewModel.getCurrentDateString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Thursday, 08 February", currentDateString);
     }
 
     @Test
