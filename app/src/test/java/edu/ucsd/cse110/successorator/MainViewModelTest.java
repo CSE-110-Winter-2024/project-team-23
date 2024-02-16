@@ -265,4 +265,43 @@ public class MainViewModelTest {
         assertNotNull(completeGoalsToDisplay);
         assertEquals(0, completeGoalsToDisplay.size());
     }
+
+    @Test
+    public void US8Scenario1() {
+        mainViewModel.pressGoal(6);
+        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        var incompleteGoalsToDisplay = mainViewModel.getIncompleteGoals().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(3, completeGoalsToDisplay.size());
+        assertNotNull(incompleteGoalsToDisplay);
+        assertEquals(4, incompleteGoalsToDisplay.size());
+        assertEquals(1, (int) incompleteGoalsToDisplay.get(0).id());
+        assertEquals(2, (int) incompleteGoalsToDisplay.get(1).id());
+        assertEquals(3, (int) incompleteGoalsToDisplay.get(2).id());
+        assertEquals(6, (int) incompleteGoalsToDisplay.get(3).id());
+        assertEquals(5, (int) completeGoalsToDisplay.get(0).id());
+        assertEquals(7, (int) completeGoalsToDisplay.get(1).id());
+        assertEquals(8, (int) completeGoalsToDisplay.get(2).id());
+
+    }
+
+    @Test
+    public void US6Scenario1() {
+        mainViewModel.pressGoal(1);
+        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        var incompleteGoalsToDisplay = mainViewModel.getIncompleteGoals().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(5, completeGoalsToDisplay.size());
+        assertNotNull(incompleteGoalsToDisplay);
+        assertEquals(2, incompleteGoalsToDisplay.size());
+
+        assertEquals(2, (int) incompleteGoalsToDisplay.get(0).id());
+        assertEquals(3, (int) incompleteGoalsToDisplay.get(1).id());
+        assertEquals(1, (int) completeGoalsToDisplay.get(0).id());
+        assertEquals(5, (int) completeGoalsToDisplay.get(1).id());
+        assertEquals(6, (int) completeGoalsToDisplay.get(2).id());
+        assertEquals(7, (int) completeGoalsToDisplay.get(3).id());
+        assertEquals(8, (int) completeGoalsToDisplay.get(4).id());
+    }
+    
 }
