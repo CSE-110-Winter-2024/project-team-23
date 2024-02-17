@@ -2,25 +2,20 @@ package edu.ucsd.cse110.successorator.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import java.util.Date;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
-import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
-import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
 
 public class CreateGoalDialogFragment extends DialogFragment {
@@ -53,16 +48,25 @@ public class CreateGoalDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
+
+        //Create listener for enter key.
+        //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm <- GOATED
+        //https://guides.codepath.com/android/Basic-Event-Listeners#edittext-common-listeners
+        //https://developer.android.com/reference/android/widget/TextView.OnEditorActionListener official documentation frankly incredibly unhelpful
+        TextView.OnEditorActionListener enterListener = (v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                String content = view.goalInput.getText().toString();
+                mainViewModel.addGoal(content);
+                //Lambda functions allow for usage of this. in interface declaration.
+                //Interestingly, without it dismiss() appears to call the correct function regardless.
+                this.dismiss();
+            }
+            return false;
+        };
+        this.view.goalInput.setOnEditorActionListener(enterListener);
+
         return new AlertDialog.Builder(getActivity())
                 .setView(view.getRoot())
-                //Figure out how to turn into image/checkmarks (ascii art? emojis? svg?)
-                .setPositiveButton("Checkmark", this::onCheckClick)
                 .create();
-    }
-
-    private void onCheckClick(DialogInterface dialog, int which){
-        String content = view.goalInput.getText().toString();
-        mainViewModel.addGoal(content);
-        dialog.dismiss();
     }
 }
