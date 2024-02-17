@@ -48,10 +48,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
         //Create listener for enter key.
-        //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm <- GOATED
-        //https://guides.codepath.com/android/Basic-Event-Listeners#edittext-common-listeners
-        //https://developer.android.com/reference/android/widget/TextView.OnEditorActionListener official documentation frankly incredibly unhelpful
-        TextView.OnEditorActionListener enterListener = (v, actionId, event) -> {
+        //Interface containing method called anytime enter key is pressed.
+        //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm
+        TextView.OnEditorActionListener editListener = (v, actionId, event) -> {
+            //actionId determined in corresponding xml file.
+            //Unnecessary now but futureproofs for multiple textboxes with the same listener.
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 String content = view.goalInput.getText().toString();
                 mainViewModel.addGoal(content);
@@ -61,7 +62,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
             }
             return false;
         };
-        this.view.goalInput.setOnEditorActionListener(enterListener);
+        //Give goal input textbox an enter listener.
+        this.view.goalInput.setOnEditorActionListener(editListener);
 
         return new AlertDialog.Builder(getActivity())
                 .setView(view.getRoot())
