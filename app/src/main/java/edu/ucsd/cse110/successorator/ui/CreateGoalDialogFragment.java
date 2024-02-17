@@ -12,8 +12,6 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import java.util.Date;
-
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 
