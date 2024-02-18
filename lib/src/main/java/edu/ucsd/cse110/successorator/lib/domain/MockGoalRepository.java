@@ -17,11 +17,11 @@ public class MockGoalRepository implements GoalRepository {
             new Goal(1, "Goal 1", 1, false, 0),
             new Goal(2, "Goal 2", 2, false, 0),
             new Goal(3, "Goal 3", 3, false, 0),
-            new Goal(4, "Goal 4; should not be visible now and in 24", 4, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 15),
-            new Goal(5, "Goal 5; should be visible now but not in 24", 5, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 13),
-            new Goal(6, "Goal 6; should be visible now but not in 24", 6, true, TimeUtils.START_TIME),
-            new Goal(7, "Goal 7; should be visible now but not in 24", 7, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9),
-            new Goal(8, "Goal 8; should be visible now and in 24", 8, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11)
+            new Goal(4, "Goal 4", 4, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 15),
+            new Goal(5, "Goal 5", 5, true, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 13),
+            new Goal(6, "Goal 6", 6, true, TimeUtils.START_TIME),
+            new Goal(7, "Goal 7", 7, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9),
+            new Goal(8, "Goal 8", 8, true, TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11)
     );
 
 

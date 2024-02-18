@@ -27,7 +27,6 @@ public class Goal {
     }
 
     public Goal markComplete(@NonNull Long completionDate) {
-        // We assume method won't be called if goal is already complete
         return new Goal(id, content, sortOrder, true, completionDate);
     }
 
