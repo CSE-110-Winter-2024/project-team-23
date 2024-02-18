@@ -75,10 +75,6 @@ public class MainActivity extends AppCompatActivity {
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
 
-
-//        ListView listView = (ListView) findViewById(R.id.goal_list);
-//        listView.setEmptyView(findViewById(R.id.empty));
-
         view.goalList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // Reference for clicking on List View:
             // https://anna-scott.medium.com/clickable-listview-items-with-clickable-buttons-e52fa6030d36

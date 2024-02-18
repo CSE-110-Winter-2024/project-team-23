@@ -293,7 +293,6 @@ public class MainViewModelTest {
         assertEquals(5, (int) completeGoalsToDisplay.get(0).id());
         assertEquals(7, (int) completeGoalsToDisplay.get(1).id());
         assertEquals(8, (int) completeGoalsToDisplay.get(2).id());
-
     }
 
     @Test
@@ -314,5 +313,32 @@ public class MainViewModelTest {
         assertEquals(7, (int) completeGoalsToDisplay.get(3).id());
         assertEquals(8, (int) completeGoalsToDisplay.get(4).id());
     }
-    
+
+    @Test
+    public void Iteration1Integration1() {
+        //
+        mainViewModel.addGoal("meow");
+        var incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
+        assertNotNull(incompleteGoals);
+        assertEquals(4, incompleteGoals.size());
+        assertEquals("meow", incompleteGoals.get(3).content());
+        mainViewModel.pressGoal(9);
+        mainViewModel.pressGoal(1);
+        mainViewModel.pressGoal(2);
+        mainViewModel.pressGoal(3);
+        incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
+        assertEquals(0, incompleteGoals.size());
+        var completeGoals = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertEquals(8, completeGoals.size());
+        mainViewModel.advance24Hours();
+        assertEquals(1,
+                mainViewModel.getCompleteGoalsToDisplay().getValue().size());
+    }
+
+    @Test
+    public void Iteration1Integration2() {
+        mainViewModel.pressGoal(1);
+        mainViewModel.pressGoal(1);
+        assertEquals(3, mainViewModel.getIncompleteGoals().getValue().size());
+    }
 }
