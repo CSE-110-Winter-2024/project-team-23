@@ -123,7 +123,14 @@ public class MainViewModel extends ViewModel {
                 // Display goals that were completed after 2am today if it's after 2am
                 // Otherwise, display goals completed after 2am yesterday
                 var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
-                return TimeUtils.shouldShowGoal(goalLocalized, nowLocalized);
+                if (TimeUtils.shouldShowGoal(goalLocalized, nowLocalized)) {
+                    return true;
+                }
+
+                // Remove completed goals no longer being displayed
+                this.goalRepository.remove(goal.id());
+
+                return false;
             }).collect(Collectors.toList());
 
             this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
@@ -138,12 +145,34 @@ public class MainViewModel extends ViewModel {
                 // Display goals that were completed after 2am today if it's after 2am
                 // Otherwise, display goals completed after 2am yesterday
                 var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
-                return TimeUtils.shouldShowGoal(goalLocalized, nowLocalized);
+                if (TimeUtils.shouldShowGoal(goalLocalized, nowLocalized)) {
+                    return true;
+                }
+
+                // Remove completed goals no longer being displayed
+                this.goalRepository.remove(goal.id());
+
+                return false;
             }).collect(Collectors.toList());
 
             this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
         });
 
+        // Set goals completed in the future to be completed now.
+        // This fixes the behavior of the app wrt restarting the app and the date being in the future
+        // Without running into the bug from date storing that allows people changing timezones
+        // To never get goals cleared
+        this.completeGoalsToDisplay.observe(goals -> {
+            if (goals == null) return;
+            var now = currentDate.getValue();
+            if (now == null) return;
+            for (var goal : goals) {
+                if (goal.completionDate() > now) {
+                    var newGoal = goal.markComplete(now);
+                    goalRepository.update(newGoal);
+                }
+            }
+        });
     }
 
     public void advance24Hours() {
@@ -170,7 +199,7 @@ public class MainViewModel extends ViewModel {
             goalRepository.update(newGoal);
         } else {
 
-            var currentDate = this.currentRealDate.getValue();
+            var currentDate = this.currentDate.getValue();
             if (currentDate == null) return;
             var newGoal = goal.markComplete(currentDate);
             goalRepository.update(newGoal);
