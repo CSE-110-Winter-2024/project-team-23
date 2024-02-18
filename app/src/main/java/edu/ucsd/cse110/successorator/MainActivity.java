@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
+import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
@@ -64,8 +66,18 @@ public class MainActivity extends AppCompatActivity {
 
             listAdapter.notifyDataSetChanged();
         });
+
+        // Set tutorial text
+        TutorialTextBinding tutorialTextBinding =
+                TutorialTextBinding.inflate(getLayoutInflater(), view.getRoot(), true);
+        this.view.goalList.setEmptyView(tutorialTextBinding.getRoot());
+
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
+
+
+//        ListView listView = (ListView) findViewById(R.id.goal_list);
+//        listView.setEmptyView(findViewById(R.id.empty));
 
         view.goalList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // Reference for clicking on List View:
