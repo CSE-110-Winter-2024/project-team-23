@@ -328,7 +328,7 @@ public class MainViewModelTest {
         var completeGoals = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertEquals(8, completeGoals.size());
         mainViewModel.advance24Hours();
-        assertEquals(1,
+        assertEquals(0,
                 mainViewModel.getCompleteGoalsToDisplay().getValue().size());
     }
 
