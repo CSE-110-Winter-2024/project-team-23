@@ -73,18 +73,18 @@ public class MainViewModelTest {
             int finalId = id;
             assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == finalId));
         }
-        // Now re-press 1 and 4
+        // Now re-press 1 and 5
         mainViewModel.pressGoal(1);
-        mainViewModel.pressGoal(4);
+        mainViewModel.pressGoal(5);
         incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
         assertNotNull(incompleteGoals);
         // Now verify expected state change occured
-        // Verify that goal IDs 1, 2, 3, 4 are in the incomplete goals list and ids 5, 6 are not
+        // Verify that goal IDs 1, 2, 3, 5 are in the incomplete goals list and others are not
         assertEquals(1, (int) incompleteGoals.get(0).id());
         assertEquals(2, (int) incompleteGoals.get(1).id());
         assertEquals(3, (int) incompleteGoals.get(2).id());
-        assertEquals(4, (int) incompleteGoals.get(3).id());
-        for (int id = 5; id <= 8; id++) {
+        assertEquals(5, (int) incompleteGoals.get(3).id());
+        for (int id = 6; id <= 8; id++) {
             int finalId = id;
             assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == finalId));
         }
@@ -131,14 +131,10 @@ public class MainViewModelTest {
         assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == 4));
         // Now, advance real time (not mock time) by 24 hours
         mainViewModel.advance24Hours();
-        // Verify that goals 4, 5, 6, 7 are not visible and goal 8 is
+        // Verify that no goals are visible
         completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertNotNull(completeGoalsToDisplay);
-        for (int id = 4; id <= 7; id++) {
-            int finalId = id;
-            assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == finalId));
-        }
-        assertEquals(8, (int) completeGoalsToDisplay.get(0).id());
+        assertEquals(0, completeGoalsToDisplay.size());
         mainViewModel.advance24Hours();
         // Verify that no goals are visible
         completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
@@ -178,16 +174,17 @@ public class MainViewModelTest {
         assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == 4));
         // Now, advance real time (not mock time) by 24 hours
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH);
-        // Verify that goals 4, 5, 6, 7 are not visible and goal 8 is
+        // verify that all goals are not visible
         completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertNotNull(completeGoalsToDisplay);
-        for (int id = 4; id <= 7; id++) {
-            int finalId = id;
-            assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == finalId));
-        }
-        assertEquals(8, (int) completeGoalsToDisplay.get(0).id());
+        assertEquals(0, completeGoalsToDisplay.size());
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 2);
         // Verify that no goals are visible
+        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
+        assertNotNull(completeGoalsToDisplay);
+        assertEquals(0, completeGoalsToDisplay.size());
+        // Now travel back to the start and verify that no goals are still visible
+        dateTicker.setValue(TimeUtils.START_TIME);
         completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
         assertNotNull(completeGoalsToDisplay);
         assertEquals(0, completeGoalsToDisplay.size());
