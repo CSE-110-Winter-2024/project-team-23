@@ -9,13 +9,25 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import edu.ucsd.cse110.successorator.lib.domain.AppMode;
+import edu.ucsd.cse110.successorator.lib.domain.Context;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
+import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
+import edu.ucsd.cse110.successorator.lib.domain.filtering.IGoalFilter;
+import edu.ucsd.cse110.successorator.lib.domain.filtering.PendingGoalFilter;
+import edu.ucsd.cse110.successorator.lib.domain.filtering.RecurringGoalFilter;
+import edu.ucsd.cse110.successorator.lib.domain.filtering.TodayGoalFilter;
+import edu.ucsd.cse110.successorator.lib.domain.filtering.TomorrowGoalFilter;
+import edu.ucsd.cse110.successorator.lib.domain.sorting.DefaultGoalSorter;
+import edu.ucsd.cse110.successorator.lib.domain.sorting.IGoalSorter;
+import edu.ucsd.cse110.successorator.lib.domain.sorting.PendingGoalSorter;
+import edu.ucsd.cse110.successorator.lib.domain.sorting.RecurringGoalSorter;
+import edu.ucsd.cse110.successorator.lib.util.GoalUtils;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
@@ -24,14 +36,17 @@ import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 public class MainViewModel extends ViewModel {
     private final GoalRepository goalRepository;
     private final MutableSubject<List<Goal>> orderedGoals;
-    private final MutableSubject<List<Goal>> completedGoals;
-    private final MutableSubject<List<Goal>> completeGoalsToDisplay;
-    private final MutableSubject<List<Goal>> incompleteGoals;
+    private final MutableSubject<List<Goal>> goalsContextFiltered;
+    private final MutableSubject<List<Goal>> goalsToDisplay;
+    private final MutableSubject<IGoalSorter> goalSorter;
+    private final MutableSubject<IGoalFilter> goalFilter;
     private final MutableSubject<Long> dateOffset;
     private final MutableSubject<Long> currentRealDate;
     private final MutableSubject<Long> currentDate;
     private final MutableSubject<Calendar> currentDateLocalized;
     private final MutableSubject<String> currentDateString;
+    private final MutableSubject<Context> currentContext;
+    AppMode currentMode;
     private final Calendar dateConverter;
 
     public static final ViewModelInitializer<MainViewModel> initializer = new ViewModelInitializer<>(MainViewModel.class, creationExtras -> {
@@ -41,10 +56,10 @@ public class MainViewModel extends ViewModel {
     });
 
     /**
-     * @param goalRepository storage for goals
-     * @param offset         offset for the date as configured by the user1
-     * @param currentRealDate    how the app knows what time it is
-     * @param dateConverter  This is specifically used to convert Dates to normal representations (e.g. for display, so we know when 2am is). This is because time zones are hard. During testing we'll pass in a Calendar with a fixed time zone, because we don't want tests flaking depending on where the actions runner is located. We can't use a mock calendar class here becuase we need Calendar to do time zone handling for us; implementing time zones ourselves is inadvisable.
+     * @param goalRepository  storage for goals
+     * @param offset          offset for the date as configured by the user1
+     * @param currentRealDate how the app knows what time it is
+     * @param dateConverter   This is specifically used to convert Dates to normal representations (e.g. for display, so we know when 2am is). This is because time zones are hard. During testing we'll pass in a Calendar with a fixed time zone, because we don't want tests flaking depending on where the actions runner is located. We can't use a mock calendar class here becuase we need Calendar to do time zone handling for us; implementing time zones ourselves is inadvisable.
      */
     public MainViewModel(GoalRepository goalRepository, MutableSubject<Long> offset, MutableSubject<Long> currentRealDate, Calendar dateConverter) {
         // How dates work in this app:
@@ -63,6 +78,9 @@ public class MainViewModel extends ViewModel {
         this.currentDate = new SimpleSubject<>();
         this.currentDateLocalized = new SimpleSubject<>();
         this.currentDateString = new SimpleSubject<>();
+
+        this.currentContext = new SimpleSubject<>();
+        this.currentContext.setValue(Context.NONE);
 
         this.dateOffset.observe(offsetValue -> {
             if (offsetValue == null) return;
@@ -92,87 +110,81 @@ public class MainViewModel extends ViewModel {
         });
 
         this.orderedGoals = new SimpleSubject<>();
-        this.completedGoals = new SimpleSubject<>();
-        this.incompleteGoals = new SimpleSubject<>();
-        this.completeGoalsToDisplay = new SimpleSubject<>();
+        this.goalsContextFiltered = new SimpleSubject<>();
+        this.goalsToDisplay = new SimpleSubject<>();
+
+        this.goalSorter = new SimpleSubject<>();
+        this.goalFilter = new SimpleSubject<>();
+
+        this.goalSorter.setValue(new DefaultGoalSorter());
+        this.goalFilter.setValue(new TodayGoalFilter());
 
         this.goalRepository.findAll().observe(goals -> {
             if (goals == null) return;
+            var context = this.currentContext.getValue();
+            if (context == null) return;
             // Order the goals
-            var orderedGoals = goals.stream().sorted(Comparator.comparingInt(Goal::sortOrder)).collect(Collectors.toList());
+            var goalsToDisplay = goals.stream().filter(goal -> GoalUtils.shouldShowContext(goal, context)).collect(Collectors.toList());
 
-            this.orderedGoals.setValue(orderedGoals);
+            this.goalsContextFiltered.setValue(goalsToDisplay);
+        });
+
+        this.currentContext.observe(context -> {
+            if (context == null) return;
+            var goals = this.orderedGoals.getValue();
+            if (goals == null) return;
+            // Filter the goals on context
+            var goalsToDisplay = goals.stream().filter(goal -> GoalUtils.shouldShowContext(goal, context)).collect(Collectors.toList());
+
+            this.goalsContextFiltered.setValue(goalsToDisplay);
+        });
+
+        this.goalsContextFiltered.observe(goals -> {
+            if (goals == null) return;
+            var sorter = this.goalSorter.getValue();
+            if (sorter == null) return;
+            var sortedGoals = goals.stream().sorted(sorter).collect(Collectors.toList());
+            this.orderedGoals.setValue(sortedGoals);
+        });
+
+        this.goalSorter.observe(sorter -> {
+            if (sorter == null) return;
+            var goals = this.goalsContextFiltered.getValue();
+            if (goals == null) return;
+            var sortedGoals = goals.stream().sorted(sorter).collect(Collectors.toList());
+            this.orderedGoals.setValue(sortedGoals);
         });
 
         this.orderedGoals.observe(goals -> {
             if (goals == null) return;
-            // Filter the goals
-            var completedGoals = goals.stream().filter(Goal::completed).collect(Collectors.toList());
-            var incompleteGoals = goals.stream().filter(goal -> !goal.completed()).collect(Collectors.toList());
-
-            this.completedGoals.setValue(completedGoals);
-            this.incompleteGoals.setValue(incompleteGoals);
+            var filter = this.goalFilter.getValue();
+            if (filter == null) return;
+            var nowLocalized = currentDateLocalized.getValue();
+            var filteredGoals = goals.stream().filter(goal -> filter.shouldShow(goal, nowLocalized)).collect(Collectors.toList());
+            this.goalsToDisplay.setValue(filteredGoals);
         });
 
-        this.completedGoals.observe(completedGoals -> {
-            if (completedGoals == null) return;
+        this.goalFilter.observe(filter -> {
+            if (filter == null) return;
+            var goals = this.orderedGoals.getValue();
+            if (goals == null) return;
             var nowLocalized = currentDateLocalized.getValue();
             if (nowLocalized == null) return;
-            // Filter the goals
-            var completeGoalsToDisplay = completedGoals.stream().filter(goal -> {
-                // Display goals that were completed after 2am today if it's after 2am
-                // Otherwise, display goals completed after 2am yesterday
-                var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
-                if (TimeUtils.shouldShowGoal(goalLocalized, nowLocalized)) {
-                    return true;
-                }
-
-                // Remove completed goals no longer being displayed
-                this.goalRepository.remove(goal.id());
-
-                return false;
-            }).collect(Collectors.toList());
-
-            this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
+            var filteredGoals = goals.stream().filter(goal -> filter.shouldShow(goal, nowLocalized)).collect(Collectors.toList());
+            this.goalsToDisplay.setValue(filteredGoals);
         });
 
         this.currentDateLocalized.observe(nowLocalized -> {
             if (nowLocalized == null) return;
-            var completedGoals = this.completedGoals.getValue();
-            if (completedGoals == null) return;
-            // Filter the goals
-            var completeGoalsToDisplay = completedGoals.stream().filter(goal -> {
-                // Display goals that were completed after 2am today if it's after 2am
-                // Otherwise, display goals completed after 2am yesterday
-                var goalLocalized = TimeUtils.localize(goal.completionDate(), dateConverter);
-                if (TimeUtils.shouldShowGoal(goalLocalized, nowLocalized)) {
-                    return true;
-                }
-
-                // Remove completed goals no longer being displayed
-                this.goalRepository.remove(goal.id());
-
-                return false;
-            }).collect(Collectors.toList());
-
-            this.completeGoalsToDisplay.setValue(completeGoalsToDisplay);
-        });
-
-        // Set goals completed in the future to be completed now.
-        // This fixes the behavior of the app wrt restarting the app and the date being in the future
-        // Without running into the bug from date storing that allows people changing timezones
-        // To never get goals cleared
-        this.completeGoalsToDisplay.observe(goals -> {
+            var goals = this.orderedGoals.getValue();
             if (goals == null) return;
-            var now = currentDate.getValue();
-            if (now == null) return;
-            for (var goal : goals) {
-                if (goal.completionDate() > now) {
-                    var newGoal = goal.markComplete(now);
-                    goalRepository.update(newGoal);
-                }
-            }
+            var filter = this.goalFilter.getValue();
+            if (filter == null) return;
+            var filteredGoals = goals.stream().filter(goal -> filter.shouldShow(goal, nowLocalized)).collect(Collectors.toList());
+            this.goalsToDisplay.setValue(filteredGoals);
         });
+
+        this.currentMode = AppMode.TODAY;
     }
 
     public void advance24Hours() {
@@ -206,20 +218,51 @@ public class MainViewModel extends ViewModel {
         }
     }
 
-    public Subject<List<Goal>> getIncompleteGoals() {
-        return incompleteGoals;
+    // Open question whether this method should take a Context or a String
+    // TODO: test these methods in the PRs where they actually start being used
+    public void activateFocusMode(Context context) {
+        this.currentContext.setValue(context);
     }
 
-    public Subject<List<Goal>> getCompleteGoalsToDisplay() {
-        return completeGoalsToDisplay;
+    public void deactivateFocusMode() {
+        this.currentContext.setValue(Context.NONE);
     }
+
+    public void activateTodayView() {
+        this.goalSorter.setValue(new DefaultGoalSorter());
+        this.goalFilter.setValue(new TodayGoalFilter());
+        this.currentMode = AppMode.TODAY;
+    }
+
+    public void activateTomorrowView() {
+        this.goalSorter.setValue(new DefaultGoalSorter());
+        this.goalFilter.setValue(new TomorrowGoalFilter());
+        this.currentMode = AppMode.TOMORROW;
+    }
+
+    public void activatePendingView() {
+        this.goalSorter.setValue(new PendingGoalSorter());
+        this.goalFilter.setValue(new PendingGoalFilter());
+        this.currentMode = AppMode.PENDING;
+    }
+
+    public void activateRecurringView() {
+        this.goalSorter.setValue(new RecurringGoalSorter());
+        this.goalFilter.setValue(new RecurringGoalFilter());
+        this.currentMode = AppMode.RECURRING;
+    }
+
+    public Subject<List<Goal>> getGoalsToDisplay() {
+        return goalsToDisplay;
+    }
+
 
     public void addGoal(String contents) {
         // We could use a proper value for the completion date, but we don't really care about it
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
-        var newGoal = new Goal(null, contents, 0, false, currentTime);
+        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime);
         goalRepository.append(newGoal);
     }
 

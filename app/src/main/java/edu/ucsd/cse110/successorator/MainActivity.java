@@ -45,25 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize list adapter
         this.listAdapter = new GoalListAdapter(this.getApplicationContext(), List.of(), mainViewModel);
-        mainViewModel.getIncompleteGoals().observe(goals -> {
+        mainViewModel.getGoalsToDisplay().observe(goals -> {
             if (goals == null) return;
             listAdapter.clear();
             listAdapter.addAll(new ArrayList<>(goals));
-            var complete = mainViewModel.getCompleteGoalsToDisplay().getValue();
-            if (complete == null) {
-                return;
-            }
-            listAdapter.addAll(complete);
-            listAdapter.notifyDataSetChanged();
-        });
-        mainViewModel.getCompleteGoalsToDisplay().observe(goals -> {
-            if (goals == null) return;
-            var incomplete = mainViewModel.getIncompleteGoals().getValue();
-            if (incomplete == null) return;
-            listAdapter.clear();
-            listAdapter.addAll((incomplete));
-            listAdapter.addAll((goals));
-
             listAdapter.notifyDataSetChanged();
         });
 
