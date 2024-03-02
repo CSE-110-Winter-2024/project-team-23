@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
             View anchor = this.findViewById(R.id.change_view_menu);
             PopupMenu viewMenu = new PopupMenu(this, anchor);
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
+            viewMenu.setOnMenuItemClickListener(i -> onMenuItemClick(i));
             viewMenu.show();
         } else if (itemId == android.R.id.home) {
             this.mainViewModel.advance24Hours();
@@ -123,6 +124,29 @@ public class MainActivity extends AppCompatActivity {
     public GoalListAdapter getListAdapter() {
         return listAdapter;
     }
+
+    public boolean onMenuItemClick(MenuItem item){
+        var itemId = item.getItemId();
+        boolean clicked = true;
+        if (itemId == R.id.today_popup) {
+            this.mainViewModel.activateTodayView();
+            this.appMode = TODAY;
+        } else if (itemId == R.id.tomorrow_popup){
+            this.mainViewModel.activateTomorrowView();
+            this.appMode = TOMORROW;
+        } else if (itemId == R.id.pending_popup){
+            this.mainViewModel.activatePendingView();
+            this.appMode = PENDING;
+        } else if (itemId == R.id.recurring_popup){
+            this.mainViewModel.activateRecurringView();
+            this.appMode = RECURRING;
+        } else {
+            clicked = false;
+        }
+        updateTitle();
+        return clicked;
+    }
+
     public void updateTitle(){
         if(appMode.equals(TODAY)){
             getSupportActionBar().setTitle("Today " + dateString);
