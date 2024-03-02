@@ -106,7 +106,7 @@ public class MainViewModel extends ViewModel {
             if (displayDate.get(Calendar.HOUR_OF_DAY) < 2) {
                 displayDate.add(Calendar.DAY_OF_YEAR, -1);
             }
-            SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("EEE M/d", Locale.US);
             formatter.setCalendar(dateConverter);
             this.currentDateString.setValue(formatter.format(displayDate.getTime()));
             displayDate.add(Calendar.DATE, 1);

@@ -161,4 +161,12 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Recurring");
         }
     }
+
+    //Testing methods
+    public void setAppMode(AppMode appMode){
+        this.appMode = appMode;
+    }
+    public MainViewModel getMainViewModel(){
+        return mainViewModel;
+    }
 }
