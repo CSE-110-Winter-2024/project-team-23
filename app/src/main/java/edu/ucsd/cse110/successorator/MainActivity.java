@@ -1,6 +1,12 @@
 package edu.ucsd.cse110.successorator;
 
 
+
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.RECURRING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +24,7 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
+import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
@@ -26,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private MainViewModel mainViewModel;
     private ActivityMainBinding view;
     private GoalListAdapter listAdapter;
+    private String dateString;
+    private AppMode appMode = TODAY;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Initialize Title
+        dateString = mainViewModel.getCurrentDateString().getValue();
+        updateTitle();
+
         setContentView(view.getRoot());
 
     }
@@ -78,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
         this.mainViewModel.getCurrentDateString().observe(str -> {
             if (str == null) return;
-            getSupportActionBar().setTitle(str);
+            dateString = str;
+            updateTitle();
+            //getSupportActionBar().setTitle(str);
         });
         return true;
     }
@@ -87,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         var itemId = item.getItemId();
 
+        //Home screen menu items
         if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
             var dialogFragment = CreateGoalDialogFragment.newInstance();
@@ -97,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             PopupMenu viewMenu = new PopupMenu(this, anchor);
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
             viewMenu.show();
-        }else if (itemId == android.R.id.home) {
+        } else if (itemId == android.R.id.home) {
             this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
@@ -106,5 +122,16 @@ public class MainActivity extends AppCompatActivity {
     //Necessary for testing.
     public GoalListAdapter getListAdapter() {
         return listAdapter;
+    }
+    public void updateTitle(){
+        if(appMode.equals(TODAY)){
+            getSupportActionBar().setTitle("Today " + dateString);
+        } else if(appMode.equals(TOMORROW)){
+            getSupportActionBar().setTitle("Tomorrow " + dateString);
+        } else if(appMode.equals(PENDING)){
+            getSupportActionBar().setTitle("Pending");
+        } else {
+            getSupportActionBar().setTitle("Recurring");
+        }
     }
 }
