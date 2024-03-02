@@ -45,6 +45,7 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Long> currentDate;
     private final MutableSubject<Calendar> currentDateLocalized;
     private final MutableSubject<String> currentDateString;
+    private String tomorrowDateString;
     private final MutableSubject<Context> currentContext;
     AppMode currentMode;
     private final Calendar dateConverter;
@@ -100,13 +101,16 @@ public class MainViewModel extends ViewModel {
         });
         this.currentDateLocalized.observe(localized -> {
             if (localized == null) return;
+            //can freely change display date
             var displayDate = (Calendar) localized.clone();
             if (displayDate.get(Calendar.HOUR_OF_DAY) < 2) {
                 displayDate.add(Calendar.DAY_OF_YEAR, -1);
             }
-            SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMMM", Locale.US);
+            SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd", Locale.US);
             formatter.setCalendar(dateConverter);
             this.currentDateString.setValue(formatter.format(displayDate.getTime()));
+            displayDate.add(Calendar.DATE, 1);
+            this.tomorrowDateString = formatter.format(displayDate.getTime());
         });
 
         this.orderedGoals = new SimpleSubject<>();
@@ -200,6 +204,7 @@ public class MainViewModel extends ViewModel {
     public Subject<String> getCurrentDateString() {
         return currentDateString;
     }
+    public String getTomorrowDateString() { return this.tomorrowDateString; }
 
     public void pressGoal(int goalId) {
         var goal = goalRepository.findGoal(goalId);

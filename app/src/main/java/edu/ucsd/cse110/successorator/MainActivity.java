@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding view;
     private GoalListAdapter listAdapter;
     private String dateString;
+    private String tomorrowString;
     private AppMode appMode = TODAY;
 
     @Override
@@ -92,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         this.mainViewModel.getCurrentDateString().observe(str -> {
             if (str == null) return;
             dateString = str;
+            //Extra observer unnecessary bloat
+            tomorrowString = mainViewModel.getTomorrowDateString();
             updateTitle();
             //getSupportActionBar().setTitle(str);
         });
@@ -149,9 +152,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateTitle(){
         if(appMode.equals(TODAY)){
-            getSupportActionBar().setTitle("Today " + dateString);
+            getSupportActionBar().setTitle("Today, " + dateString);
         } else if(appMode.equals(TOMORROW)){
-            getSupportActionBar().setTitle("Tomorrow " + dateString);
+            getSupportActionBar().setTitle("Tomorrow, " + tomorrowString);
         } else if(appMode.equals(PENDING)){
             getSupportActionBar().setTitle("Pending");
         } else {
