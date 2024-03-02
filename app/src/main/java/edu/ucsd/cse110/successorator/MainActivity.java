@@ -1,16 +1,12 @@
 package edu.ucsd.cse110.successorator;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.add_bar, menu);
+        getMenuInflater().inflate(R.menu.top_right_bar, menu);
 
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -95,7 +91,13 @@ public class MainActivity extends AppCompatActivity {
             //probably refactor into its own method later
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
-        } else if (itemId == android.R.id.home) {
+        }
+        else if (itemId == R.id.change_view_menu) {
+            View anchor = this.findViewById(R.id.change_view_menu);
+            PopupMenu viewMenu = new PopupMenu(this, anchor);
+            viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
+            viewMenu.show();
+        }else if (itemId == android.R.id.home) {
             this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
