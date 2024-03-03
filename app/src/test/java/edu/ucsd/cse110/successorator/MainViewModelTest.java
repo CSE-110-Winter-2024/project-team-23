@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Calendar;
-import java.util.List;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
@@ -49,99 +48,116 @@ public class MainViewModelTest {
         mainViewModel = null;
     }
 
+    public void assertIncompleteCount(int expected) {
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var incompleteGoals = displayGoals.stream().filter(goal -> !goal.completed()).count();
+        assertEquals(expected, incompleteGoals);
+    }
+
+    public void assertCompleteCount(int expected) {
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var completeGoals = displayGoals.stream().filter(Goal::completed).count();
+        assertEquals(expected, completeGoals);
+    }
+
+    public void assertPresence(int id, boolean expected) {
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var present = displayGoals.stream().anyMatch(goal -> goal.id() == id);
+        assertEquals(expected, present);
+    }
+
+    public void assertPresenceInComplete(int id, boolean expected) {
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var present = displayGoals.stream().filter(Goal::completed).anyMatch(goal -> goal.id() == id);
+        assertEquals(expected, present);
+    }
+
+    public void assertPresenceInIncomplete(int id, boolean expected) {
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var present = displayGoals.stream().filter(goal -> !goal.completed()).anyMatch(goal -> goal.id() == id);
+        assertEquals(expected, present);
+    }
+
     @Test
-    public void pressGoal() {
+    public void pressGoalToday() {
         // We test both pressing complete and incomplete goals
         // Including pressing a button twice, and making sure there are no side effects
         mainViewModel.pressGoal(1);
 
-        var incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
         // Verify that goal ID 1 is visible and has the correct date
-        var completeGoals = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoals);
-        assertEquals((Integer) 1, completeGoals.get(0).id());
-        assertEquals((Long) TimeUtils.START_TIME, completeGoals.get(0).completionDate());
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var goal = displayGoals.stream().filter(g -> g.id() == 1).findFirst().orElse(null);
+        assertNotNull(goal);
+        assertEquals((Long) TimeUtils.START_TIME, goal.completionDate());
+        assertTrue(goal.completed());
 
         // Verify that goal IDs 2, 3 are in the incomplete goals list and ids 1, 4, 5, 6 are not
-        incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
-        assertEquals(2, (int) incompleteGoals.get(0).id());
-        assertEquals(3, (int) incompleteGoals.get(1).id());
-        assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == 1));
+        assertIncompleteCount(2);
+        assertPresenceInIncomplete(2, true);
+        assertPresenceInIncomplete(3, true);
+        assertPresenceInIncomplete(1, false);
         for (int id = 4; id <= 8; id++) {
-            int finalId = id;
-            assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == finalId));
+            assertPresenceInIncomplete(id, false);
         }
         // Now re-press 1 and 5
         mainViewModel.pressGoal(1);
         mainViewModel.pressGoal(5);
-        incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
         // Now verify expected state change occured
         // Verify that goal IDs 1, 2, 3, 5 are in the incomplete goals list and others are not
-        assertEquals(1, (int) incompleteGoals.get(0).id());
-        assertEquals(2, (int) incompleteGoals.get(1).id());
-        assertEquals(3, (int) incompleteGoals.get(2).id());
-        assertEquals(5, (int) incompleteGoals.get(3).id());
+        assertIncompleteCount(4);
+        assertPresenceInIncomplete(1, true);
+        assertPresenceInIncomplete(2, true);
+        assertPresenceInIncomplete(3, true);
+        assertPresenceInIncomplete(5, true);
         for (int id = 6; id <= 8; id++) {
-            int finalId = id;
-            assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == finalId));
+            assertPresenceInIncomplete(id, false);
         }
     }
 
-    @Test
-    public void getIncompleteGoals() {
-        // We test both pressing complete and incomplete goals
-        // First verify expected state (that first 3 goals are incomplete)
-        var incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
-        assertEquals(3, incompleteGoals.size());
-        // Verify that goal IDs 1, 2, 3 are in the incomplete goals list and other ids are not
-        // Also tests ordering
-        assertEquals(1, (int) incompleteGoals.get(0).id());
-        assertEquals(2, (int) incompleteGoals.get(1).id());
-        assertEquals(3, (int) incompleteGoals.get(2).id());
-        for (int id = 4; id <= 8; id++) {
-            int finalId = id;
-            assertFalse(incompleteGoals.stream().anyMatch(goal -> goal.id() == finalId));
-        }
-    }
 
     @Test
     public void addGoal() {
         // Add a new goal
         mainViewModel.addGoal("Goal 9");
-        // Verify that the new goal is in the incomplete goals list
-        var incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
-        assertEquals(9, (int) incompleteGoals.get(3).id());
+        // Verify that the new goal is displayed
+        assertPresence(9, true);
+        assertPresenceInIncomplete(9, true);
+        // Verify that the new goal has correct dates
+        var displayGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(displayGoals);
+        var goal = displayGoals.stream().filter(g -> g.id() == 9).findFirst().orElse(null);
+        assertNotNull(goal);
+        assertEquals((Long) TimeUtils.START_TIME, goal.completionDate());
+        assertEquals((Long) TimeUtils.START_TIME, goal.startDate());
+        assertFalse(goal.completed());
+        assertEquals("Goal 9", goal.content());
+
     }
 
     @Test
     public void advance24HoursGoalVisibility() {
-        // Note that this is a copy of the below method but changing the time via UI methods
-        // Verify that goal 4 is not visible but 5, 6, 7, 8 are
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(4, completeGoalsToDisplay.size());
-        for (int id = 5; id <= 8; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 5).id());
+        // Verify that all goals except 4 and 8 are visible
+        for (int id = 1; id <= 8; id++) {
+            assertPresence(id, id != 4 && id != 8);
         }
-        assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == 4));
         // Now, advance real time (not mock time) by 24 hours
         mainViewModel.advance24Hours();
-        // Verify that no goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
+        // verify that all completed goals except 8 are not visible
+        for (int id = 4; id <= 8; id++) {
+            assertPresence(id, id == 8);
+        }
+        assertIncompleteCount(3);
         mainViewModel.advance24Hours();
         // Verify that no goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
+        assertIncompleteCount(3);
+        assertCompleteCount(0);
     }
-
 
     // Pretty much tests US2 scenarios 1 and 2 as well (just differnt time increments).
     @Test
@@ -163,179 +179,96 @@ public class MainViewModelTest {
     }
 
     @Test
-    public void getCompleteGoalsToDisplay() {
-        // Verify that goal 4 is not visible but 5, 6, 7, 8 are
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(4, completeGoalsToDisplay.size());
-        for (int id = 5; id <= 8; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 5).id());
+    public void getGoalsToDisplay() {
+        // Verify that all goals except 4 and 8 are visible
+        for (int id = 1; id <= 8; id++) {
+            assertPresence(id, id != 4 && id != 8);
         }
-        assertFalse(completeGoalsToDisplay.stream().anyMatch(goal -> goal.id() == 4));
         // Now, advance real time (not mock time) by 24 hours
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH);
-        // verify that all goals are not visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
+        // verify that all complete goals except 8 are not visible
+        for (int id = 4; id <= 8; id++) {
+            assertPresence(id, id == 8);
+        }
+        assertIncompleteCount(3);
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 2);
         // Verify that no goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
-        // Now travel back to the start and verify that no goals are still visible
-        dateTicker.setValue(TimeUtils.START_TIME);
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
-    }
-
-
-    @Test
-    public void US7Scenario1() {
-        // Since our standard start time is 4pm, move to 10:30
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 6 + TimeUtils.MINUTE_LENGTH * 30);
-        var US7GoalRepository = MockGoalRepository.createWithUS7TestGoals();
-        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
-        // Verify that all 3 goals are visible
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
-        // Move to 11:30
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 7 + TimeUtils.MINUTE_LENGTH * 30);
-        // simulate closing the app by creating a new mainViewModel
-        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
-        // Verify that all 3 goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
-        // Move to 1:30 next day
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9 + TimeUtils.MINUTE_LENGTH * 30);
-        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
-        // Verify that all 3 goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
-        // Wait another hour
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 10 + TimeUtils.MINUTE_LENGTH * 30);
-        mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
-        // Verify that no goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
+        assertIncompleteCount(3);
+        assertCompleteCount(0);
     }
 
     @Test
-    public void US7Scenario2() {
+    public void rolloverTime2AM() {
         // We assume the app is open the whole time now
         var US7GoalRepository = MockGoalRepository.createWithUS7TestGoals();
         mainViewModel = new MainViewModel(US7GoalRepository, dateOffset, dateTicker, localizedCalendar);
         // Since our standard start time is 4pm, move to 10:30
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 6 + TimeUtils.MINUTE_LENGTH * 30);
         // Verify that all 3 goals are visible
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
+        assertPresence(1, true);
+        assertPresence(2, true);
+        assertPresence(3, true);
         // Move to 11:30
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 7 + TimeUtils.MINUTE_LENGTH * 30);
         // Verify that all 3 goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
+        assertPresence(1, true);
+        assertPresence(2, true);
+        assertPresence(3, true);
         // Move to 1:30 next day
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9 + TimeUtils.MINUTE_LENGTH * 30);
         // Verify that all 3 goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        for (int id = 1; id <= 3; id++) {
-            assertEquals(id, (int) completeGoalsToDisplay.get(id - 1).id());
-        }
+        assertPresence(1, true);
+        assertPresence(2, true);
+        assertPresence(3, true);
         // Wait another hour
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 10 + TimeUtils.MINUTE_LENGTH * 30);
         // Verify that no goals are visible
-        completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(0, completeGoalsToDisplay.size());
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
     }
 
     @Test
     public void US8Scenario1() {
         mainViewModel.pressGoal(6);
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        var incompleteGoalsToDisplay = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(3, completeGoalsToDisplay.size());
-        assertNotNull(incompleteGoalsToDisplay);
-        assertEquals(4, incompleteGoalsToDisplay.size());
-        assertEquals(1, (int) incompleteGoalsToDisplay.get(0).id());
-        assertEquals(2, (int) incompleteGoalsToDisplay.get(1).id());
-        assertEquals(3, (int) incompleteGoalsToDisplay.get(2).id());
-        assertEquals(6, (int) incompleteGoalsToDisplay.get(3).id());
-        assertEquals(5, (int) completeGoalsToDisplay.get(0).id());
-        assertEquals(7, (int) completeGoalsToDisplay.get(1).id());
-        assertEquals(8, (int) completeGoalsToDisplay.get(2).id());
+        assertIncompleteCount(4);
+        assertCompleteCount(2);
     }
 
     @Test
     public void US6Scenario1() {
         mainViewModel.pressGoal(1);
-        var completeGoalsToDisplay = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        var incompleteGoalsToDisplay = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(completeGoalsToDisplay);
-        assertEquals(5, completeGoalsToDisplay.size());
-        assertNotNull(incompleteGoalsToDisplay);
-        assertEquals(2, incompleteGoalsToDisplay.size());
 
-        assertEquals(2, (int) incompleteGoalsToDisplay.get(0).id());
-        assertEquals(3, (int) incompleteGoalsToDisplay.get(1).id());
-        assertEquals(1, (int) completeGoalsToDisplay.get(0).id());
-        assertEquals(5, (int) completeGoalsToDisplay.get(1).id());
-        assertEquals(6, (int) completeGoalsToDisplay.get(2).id());
-        assertEquals(7, (int) completeGoalsToDisplay.get(3).id());
-        assertEquals(8, (int) completeGoalsToDisplay.get(4).id());
+        assertIncompleteCount(2);
+        assertCompleteCount(4);
     }
 
     @Test
     public void Iteration1Integration1() {
         //
         mainViewModel.addGoal("meow");
-        var incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertNotNull(incompleteGoals);
-        assertEquals(4, incompleteGoals.size());
-        assertEquals("meow", incompleteGoals.get(3).content());
+        assertIncompleteCount(4);
+        assertPresenceInIncomplete(9, true);
+        var goalsToDisplay = mainViewModel.getGoalsToDisplay().getValue();
+        assertNotNull(goalsToDisplay);
+        assertEquals(7, goalsToDisplay.size());
+        var goal = goalsToDisplay.stream().filter(g -> g.id() == 9).findFirst().orElse(null);
+        assertEquals("meow", goal.content());
         mainViewModel.pressGoal(9);
         mainViewModel.pressGoal(1);
         mainViewModel.pressGoal(2);
         mainViewModel.pressGoal(3);
-        incompleteGoals = mainViewModel.getIncompleteGoals().getValue();
-        assertEquals(0, incompleteGoals.size());
-        var completeGoals = mainViewModel.getCompleteGoalsToDisplay().getValue();
-        assertEquals(8, completeGoals.size());
+        assertIncompleteCount(0);
+        assertCompleteCount(7);
         mainViewModel.advance24Hours();
-        assertEquals(0,
-                mainViewModel.getCompleteGoalsToDisplay().getValue().size());
+        assertCompleteCount(1);
     }
 
     @Test
     public void Iteration1Integration2() {
         mainViewModel.pressGoal(1);
         mainViewModel.pressGoal(1);
-        assertEquals(3, mainViewModel.getIncompleteGoals().getValue().size());
+        assertIncompleteCount(3);
+        assertPresence(1, true);
+        assertCompleteCount(3);
     }
 }

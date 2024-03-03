@@ -10,29 +10,42 @@ public class TimeUtilsTest {
 
     // Test generated with GPT4, but checked for correctness by me
     @Test
-    public void shouldShowGoal() {
+    public void shouldShowCompletedGoal() {
         // Test 1: Goal Created After 2AM Today and Current Time is After 2AM
         var now = Calendar.getInstance();
         now.set(Calendar.HOUR_OF_DAY, 4);
         var goal = (Calendar) now.clone();
         goal.set(Calendar.HOUR_OF_DAY, 3);
-        assertTrue(TimeUtils.shouldShowGoal(goal, now));
+        var yesterday = (Calendar) now.clone();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        var today = (Calendar) now.clone();
+        var tomorrow = (Calendar) now.clone();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        assertTrue(TimeUtils.shouldShowCompleteGoal(goal, now, yesterday));
+        assertTrue(TimeUtils.shouldShowCompleteGoal(goal, now, today));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, tomorrow));
 
-        // Test 2: Goal Created Before 2AM Today and Current Time is After 2AM
+        // Test 2: Goal completed Before 2AM Today and Current Time is After 2AM
         goal.set(Calendar.HOUR_OF_DAY, 1);
-        assertFalse(TimeUtils.shouldShowGoal(goal, now));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, yesterday));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, today));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, tomorrow));
 
         // Adjust now to represent a time before 2AM - For tests 3, 4
         now.set(Calendar.HOUR_OF_DAY, 1);
 
-        // Test 3: Goal Created After 2AM Yesterday and Current Time is Before 2AM
+        // Test 3: Goal completed After 2AM Yesterday and Current Time is Before 2AM
         goal.add(Calendar.DAY_OF_YEAR, -1); // Setting goal to yesterday
         goal.set(Calendar.HOUR_OF_DAY, 3);
-        assertTrue(TimeUtils.shouldShowGoal(goal, now));
+        assertTrue(TimeUtils.shouldShowCompleteGoal(goal, now, yesterday));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, today));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, tomorrow));
 
-        // Test 4: Goal Created Before 2AM Yesterday and Current Time is Before 2AM
+        // Test 4: Goal completed Before 2AM Yesterday and Current Time is Before 2AM
         goal.set(Calendar.HOUR_OF_DAY, 1);
-        assertFalse(TimeUtils.shouldShowGoal(goal, now));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, yesterday));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, today));
+        assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, tomorrow));
     }
 
     @Test
@@ -55,5 +68,44 @@ public class TimeUtilsTest {
         assertEquals(localized.get(Calendar.HOUR_OF_DAY), 16);
         assertEquals(localized.get(Calendar.MINUTE), 0);
         assertEquals(localized.get(Calendar.SECOND), 0);
+    }
+
+    @Test
+    public void shouldShowIncompleteGoal() {
+        // Test 1: Goal Created After 2AM Today and Current Time is After 2AM
+        var now = Calendar.getInstance();
+        now.set(Calendar.HOUR_OF_DAY, 4);
+        var today = (Calendar) now.clone();
+        var tomorrow = (Calendar) now.clone();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        var yesterday = (Calendar) now.clone();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(yesterday, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoal(tomorrow, now));
+
+        // Test 2: Goal Created Before 2AM Today and Current Time is After 2AM
+        yesterday.set(Calendar.HOUR_OF_DAY, 1);
+        today.set(Calendar.HOUR_OF_DAY, 1);
+        tomorrow.set(Calendar.HOUR_OF_DAY, 1);
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(yesterday, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(today, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(tomorrow, now));
+
+        // Adjust now to represent a time before 2AM - For tests 3, 4
+        now.set(Calendar.HOUR_OF_DAY, 1);
+
+        // Test 3: Goal Created before 2AM and Current Time is Before 2AM
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(yesterday, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoal(tomorrow, now));
+
+        // Test 4: Goal Created after 2AM and Current Time is Before 2AM
+        yesterday.set(Calendar.HOUR_OF_DAY, 3);
+        today.set(Calendar.HOUR_OF_DAY, 3);
+        tomorrow.set(Calendar.HOUR_OF_DAY, 3);
+        assertTrue(TimeUtils.shouldShowIncompleteGoal(yesterday, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoal(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoal(tomorrow, now));
     }
 }
