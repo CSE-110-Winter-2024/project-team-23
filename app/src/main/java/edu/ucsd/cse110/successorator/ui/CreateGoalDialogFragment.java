@@ -9,11 +9,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
+import edu.ucsd.cse110.successorator.lib.domain.Context;
 
 
 public class CreateGoalDialogFragment extends DialogFragment {
@@ -40,6 +43,20 @@ public class CreateGoalDialogFragment extends DialogFragment {
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.mainViewModel = modelProvider.get(MainViewModel.class);
+    }
+
+    void contextButtonSelected(Context c) {
+        switch (c) {
+            case HOME:
+
+                break;
+            case WORK:
+                break;
+            case SCHOOL:
+                break;
+            case ERRANDS:
+                break;
+        }
     }
 
     @NonNull

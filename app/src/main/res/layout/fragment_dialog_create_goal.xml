@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,4 +17,62 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/goal_input">
+
+        <RadioButton
+            android:id="@+id/homebutton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/home_context_radio"
+            android:button="@null"
+            android:paddingLeft="25dp"
+            android:text="@string/home"
+            android:textSize="30sp" />
+
+        <RadioButton
+            android:id="@+id/workbutton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/work_context_radio"
+            android:button="@null"
+            android:paddingLeft="22dp"
+            android:text="@string/work"
+            android:textSize="30sp" />
+
+        <RadioButton
+            android:id="@+id/schoolbutton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/school_context_radio"
+            android:button="@null"
+            android:paddingLeft="27dp"
+            android:text="@string/school"
+            android:textSize="30sp" />
+
+        <RadioButton
+            android:id="@+id/errandsbutton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/errands_context_radio"
+            android:button="@null"
+            android:buttonTint="#DDECD2"
+            android:paddingLeft="27dp"
+            android:text="@string/errands"
+            android:textSize="30sp" />
+    </RadioGroup>
+
+
+    <!--Uses https://www.youtube.com/watch?v=m7TJha6zlN0 as a guide to the buttons-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
