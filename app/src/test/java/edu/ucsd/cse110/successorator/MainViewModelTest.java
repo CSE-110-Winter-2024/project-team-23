@@ -165,17 +165,35 @@ public class MainViewModelTest {
         // Verify that the current date string is correct
         var currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wednesday, 07 February", currentDateString);
+        assertEquals("Wed 2/7", currentDateString);
         // advance 9 hours and verify no change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
         currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wednesday, 07 February", currentDateString);
+        assertEquals("Wed 2/7", currentDateString);
         // Advance another 2 and verify change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
         currentDateString = mainViewModel.getCurrentDateString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Thursday, 08 February", currentDateString);
+        assertEquals("Thu 2/8", currentDateString);
+    }
+
+    @Test
+    public void getTomorrowDateString() {
+        // Verify that the current date string is correct
+        var tomorrowDateString = mainViewModel.getTomorrowDateString();
+        assertNotNull(tomorrowDateString);
+        assertEquals("Thu 2/8", tomorrowDateString);
+        // advance 9 hours and verify no change
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
+        tomorrowDateString = mainViewModel.getTomorrowDateString();
+        assertNotNull(tomorrowDateString);
+        assertEquals("Thu 2/8", tomorrowDateString);
+        // Advance another 2 and verify change
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
+        tomorrowDateString = mainViewModel.getTomorrowDateString();
+        assertNotNull(tomorrowDateString);
+        assertEquals("Fri 2/9", tomorrowDateString);
     }
 
     @Test

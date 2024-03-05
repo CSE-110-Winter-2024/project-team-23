@@ -6,6 +6,10 @@ import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 import static junit.framework.TestCase.assertEquals;
 
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.RECURRING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+
 import android.content.res.Resources;
 
 import androidx.lifecycle.Lifecycle;
@@ -38,7 +42,6 @@ public class MainActivityTest {
     @Test
     public void listDisplaysDatabase() {
         try (var scenario = ActivityScenario.launch(MainActivity.class)) {
-
             var goalRepository = MockGoalRepository.createWithDefaultGoals();
             var dateOffset = new SimpleSubject<Long>();
             dateOffset.setValue(0L);
@@ -51,7 +54,7 @@ public class MainActivityTest {
             scenario.onActivity(activity -> {
                 var adapter = activity.getListAdapter();
                 adapter.clear();
-                var subject = mainViewModel.getIncompleteGoals();
+                var subject = mainViewModel.getGoalsToDisplay();
                 var goalList = subject.getValue();
                 adapter.clear();
                 adapter.addAll(goalList);
@@ -63,6 +66,37 @@ public class MainActivityTest {
                     var actual = goal.content();
                     assertEquals(expected, actual);
                 }
+            });
+
+            // Simulate moving to the started state (above will then be called).
+            scenario.moveToState(Lifecycle.State.STARTED);
+        }
+    }
+
+    @Test
+    public void titleUpdates() {
+        try (var scenario = ActivityScenario.launch(MainActivity.class)) {
+            // Observe the scenario's lifecycle to wait until the activity is created.
+            scenario.onActivity(activity -> {
+                MainViewModel mainViewModel = activity.getMainViewModel();
+                var expected = "Today, " + mainViewModel.getCurrentDateString().getValue();
+                var actual = activity.getSupportActionBar().getTitle();
+                assertEquals(expected, actual);
+                activity.setAppMode(TOMORROW);
+                activity.updateTitle();
+                expected = "Tomorrow, " + mainViewModel.getTomorrowDateString();
+                actual = activity.getSupportActionBar().getTitle();
+                assertEquals(expected, actual);
+                activity.setAppMode(PENDING);
+                activity.updateTitle();
+                expected = "Pending";
+                actual = activity.getSupportActionBar().getTitle();
+                assertEquals(expected, actual);
+                activity.setAppMode(RECURRING);
+                activity.updateTitle();
+                expected = "Recurring";
+                actual = activity.getSupportActionBar().getTitle();
+                assertEquals(expected, actual);
             });
 
             // Simulate moving to the started state (above will then be called).
