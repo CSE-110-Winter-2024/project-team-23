@@ -1,5 +1,6 @@
 package edu.ucsd.cse110.successorator.lib.util;
 
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -94,7 +95,8 @@ public class TimeUtils {
                 next.add(Calendar.DAY_OF_MONTH, day - 1);
                 break;
         }
-        return next;
+        // Sometimes nonzero ms count causes boundary cases
+        return TimeUtils.twoAMNormalized(next);
     }
 
     public static int nextGoalRecurrenceIndex(Calendar nowLocalized, Calendar startTime, RecurrenceType recurrenceType) {
