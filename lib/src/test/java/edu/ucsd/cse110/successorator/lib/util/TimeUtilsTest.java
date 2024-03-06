@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Calendar;
 
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
+import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 public class TimeUtilsTest {
 
@@ -49,6 +50,7 @@ public class TimeUtilsTest {
         assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, today));
         assertFalse(TimeUtils.shouldShowCompleteGoal(goal, now, tomorrow));
     }
+
 
     @Test
     public void localize() {
@@ -112,26 +114,183 @@ public class TimeUtilsTest {
     }
 
     @Test
-    public void generateTitleString() {
-        var localizedCalendar = Calendar.getInstance(TimeUtils.GMT);
-        var now = TimeUtils.localize(TimeUtils.START_TIME, localizedCalendar);
-        // Verify that the current date string is correct
-        var currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
-        assertEquals("Today, Wed 2/7", currentDateString);
-        // advance 9 hours and verify no change
-        now.add(Calendar.HOUR_OF_DAY, 9);
-        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
-        assertEquals("Today, Wed 2/7", currentDateString);
-        // Advance another 2 and verify change
-        now.add(Calendar.HOUR_OF_DAY, 2);
-        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
-        assertEquals("Today, Thu 2/8", currentDateString);
-        // Now test different app modes
-        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.PENDING);
-        assertEquals("Pending", currentDateString);
-        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TOMORROW);
-        assertEquals("Tomorrow, Fri 2/9", currentDateString);
-        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.RECURRING);
-        assertEquals("Recurring", currentDateString);
+    public void nthRecurrence() {
+        // Sanity test
+        var now = Calendar.getInstance();
+        // Only accepts 2am normalized
+        now = TimeUtils.twoAMNormalized(now);
+        assertEquals(TimeUtils.nthRecurrence(now, RecurrenceType.DAILY, 0), now);
+        assertEquals(TimeUtils.nthRecurrence(now, RecurrenceType.WEEKLY, 0), now);
+        assertEquals(TimeUtils.nthRecurrence(now, RecurrenceType.MONTHLY, 0), now);
+        assertEquals(TimeUtils.nthRecurrence(now, RecurrenceType.YEARLY, 0), now);
+
+
+        int year = 2024;
+        int month = Calendar.FEBRUARY;
+        int day = 7;
+        int hour = 12;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, 0, 0);
+        calendar.setTimeZone(TimeUtils.GMT);
+
+        // Yearly recurrence happy path
+        // Test n=1
+        // No need to test more than that
+        var recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.YEARLY, 1);
+        assertEquals(recurrence.get(Calendar.YEAR), year + 1);
+
+
+        // Yearly recurrence feb 29
+        calendar = Calendar.getInstance();
+        calendar.set(year, month, 29, hour, 0, 0);
+        calendar.setTimeZone(TimeUtils.GMT);
+
+        // Test n=1
+        recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.YEARLY, 1);
+        assertEquals(recurrence.get(Calendar.YEAR), year + 1);
+        assertEquals(recurrence.get(Calendar.MONTH), Calendar.MARCH);
+        assertEquals(recurrence.get(Calendar.DAY_OF_MONTH), 1);
+
+        calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, 0, 0);
+        calendar.setTimeZone(TimeUtils.GMT);
+
+        // Monthly recurrence happy path
+        // Test n=1, 10, 100
+        for (int i = 1; i <= 100; i *= 10) {
+            var testTime = (Calendar) calendar.clone();
+            for (int j = 0; j < i; j++) {
+                testTime.add(Calendar.MONTH, 1);
+            }
+            recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.MONTHLY, i);
+            assertEquals(recurrence.get(Calendar.MONTH), testTime.get(Calendar.MONTH));
+            assertEquals(recurrence.get(Calendar.YEAR), testTime.get(Calendar.YEAR));
+        }
+
+        // Monthly recurrence 5th day of week not present in next month
+        // March 29 2024 is a Friday (5th friday)
+        // There is no 5th Friday in April so it should fall on May 3
+        // But there is a 5th Friday in May so it should fall on May 31
+        calendar = Calendar.getInstance();
+        calendar.set(year, Calendar.MARCH, 29, hour, 0, 0);
+        calendar.setTimeZone(TimeUtils.GMT);
+
+        recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.MONTHLY, 1);
+        assertEquals(recurrence.get(Calendar.MONTH), Calendar.MAY);
+        assertEquals(recurrence.get(Calendar.DAY_OF_MONTH), 3);
+
+        recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.MONTHLY, 2);
+        assertEquals(recurrence.get(Calendar.MONTH), Calendar.MAY);
+        assertEquals(recurrence.get(Calendar.DAY_OF_MONTH), 31);
+
+
+
+        calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, 0, 0);
+        calendar.setTimeZone(TimeUtils.GMT);
+
+        // Weekly recurrence happy path (there is no sad path)
+        // Test n=1, 10, 100, 1000
+        // n is chosen so it covers >2 years, which is why it's 1000 here but 100 for months
+        for (int i = 1; i <= 1000; i *= 10) {
+            var testTime = (Calendar) calendar.clone();
+            for (int j = 0; j < i; j++) {
+                testTime.add(Calendar.WEEK_OF_YEAR, 1);
+            }
+            recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.WEEKLY, i);
+            assertEquals(recurrence.get(Calendar.WEEK_OF_YEAR), testTime.get(Calendar.WEEK_OF_YEAR));
+        }
+
+        // Daily recurrence happy path (there is no sad path)
+        // Test n=1, 10, 100, 1000
+        for (int i = 1; i <= 1000; i *= 10) {
+            var testTime = (Calendar) calendar.clone();
+            for (int j = 0; j < i; j++) {
+                testTime.add(Calendar.DAY_OF_YEAR, 1);
+            }
+            recurrence = TimeUtils.nthRecurrence(calendar, RecurrenceType.DAILY, i);
+            assertEquals(recurrence.get(Calendar.DAY_OF_YEAR), testTime.get(Calendar.DAY_OF_YEAR));
+        }
+    }
+
+    @Test
+    public void nextGoalRecurrenceIndex() {
+        // Test 1: Recurrence is Daily
+        var now = Calendar.getInstance();
+        now = TimeUtils.twoAMNormalized(now);
+        var start = (Calendar) now.clone();
+
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.DAILY), 1);
+        start.add(Calendar.DAY_OF_YEAR, -1);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.DAILY), 2);
+        start.add(Calendar.DAY_OF_YEAR, -500);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.DAILY), 502);
+
+        // Test 2: Recurrence is Weekly
+        start = (Calendar) now.clone();
+
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.WEEKLY), 1);
+        start.add(Calendar.WEEK_OF_YEAR, -1);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.WEEKLY), 2);
+        start.add(Calendar.DAY_OF_YEAR, -1);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.WEEKLY), 2);
+
+        // For next 2 tests we test differently for edge cases
+
+        // Test 3: Recurrence is Monthly
+        // 5th friday of december 2023 is 12/29/2023
+        // Test with that as a start date
+        // Then, test number of recurrences for the day before, during, and after the march and may dates from the nthRecurrence test
+        start = Calendar.getInstance();
+        start.setTimeZone(TimeUtils.GMT);
+        start.set(2023, Calendar.DECEMBER, 29, 12, 0, 0);
+        now.setTimeZone(TimeUtils.GMT);
+        now = TimeUtils.twoAMNormalized(now);
+        now.set(2024, Calendar.MARCH, 28, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 3);
+        now.set(2024, Calendar.MARCH, 29, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 4);
+        now.set(2024, Calendar.MARCH, 30, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 4);
+        now.set(2024, Calendar.MAY, 2, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 4);
+        now.set(2024, Calendar.MAY, 3, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 5);
+        now.set(2024, Calendar.MAY, 4, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 5);
+        now.set(2024, Calendar.MAY, 30, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 5);
+        now.set(2024, Calendar.MAY, 31, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 6);
+        now.set(2024, Calendar.JUNE, 1, 12, 0, 0);
+        assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 6);
+
+
+
+        // Test 4: Recurrence is Yearly
+    }
+
+    @Test
+    public void twoAMNormalized() {
+        // Test 1: Date is before 2AM
+        var now = Calendar.getInstance();
+        var test = (Calendar) now.clone();
+        test.set(Calendar.HOUR_OF_DAY, 1);
+        var normalized = TimeUtils.twoAMNormalized(test);
+        assertEquals(normalized.get(Calendar.HOUR_OF_DAY), 12);
+        assertEquals(normalized.get(Calendar.MINUTE), 0);
+        assertEquals(normalized.get(Calendar.SECOND), 0);
+        assertEquals(normalized.get(Calendar.MILLISECOND), 0);
+        assertEquals(normalized.get(Calendar.DAY_OF_YEAR), test.get(Calendar.DAY_OF_YEAR) - 1);
+        // Test 2: Date is after 2AM
+        test.set(Calendar.HOUR_OF_DAY, 3);
+        normalized = TimeUtils.twoAMNormalized(test);
+        assertEquals(normalized.get(Calendar.HOUR_OF_DAY), 12);
+        assertEquals(normalized.get(Calendar.MINUTE), 0);
+        assertEquals(normalized.get(Calendar.SECOND), 0);
+        assertEquals(normalized.get(Calendar.MILLISECOND), 0);
+        assertEquals(normalized.get(Calendar.DAY_OF_YEAR), test.get(Calendar.DAY_OF_YEAR));
+
     }
 }
