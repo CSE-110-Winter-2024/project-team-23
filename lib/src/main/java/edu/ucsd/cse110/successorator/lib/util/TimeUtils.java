@@ -1,9 +1,16 @@
 package edu.ucsd.cse110.successorator.lib.util;
 
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
+import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 public class TimeUtils {
@@ -60,6 +67,28 @@ public class TimeUtils {
         } else {
             // Accept every goal created after 2am today, but before 2am tomorrow
             return startTime.after(today2am) && startTime.before(tomorrow2am);
+        }
+    }
+
+    public static String generateTitleString(Calendar dateConverter, Calendar localized, AppMode appMode) {
+        var displayDate = (Calendar) localized.clone();
+        if (displayDate.get(Calendar.HOUR_OF_DAY) < 2) {
+            displayDate.add(Calendar.DAY_OF_YEAR, -1);
+        }
+        if (appMode.equals(TOMORROW)) {
+            displayDate.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE M/d", Locale.US);
+        formatter.setCalendar(dateConverter);
+        var dateString = formatter.format(displayDate.getTime());
+        if (appMode.equals(TODAY)) {
+            return "Today, " + dateString;
+        } else if (appMode.equals(TOMORROW)) {
+            return "Tomorrow, " + dateString;
+        } else if (appMode.equals(PENDING)) {
+            return "Pending";
+        } else {
+            return "Recurring";
         }
     }
 

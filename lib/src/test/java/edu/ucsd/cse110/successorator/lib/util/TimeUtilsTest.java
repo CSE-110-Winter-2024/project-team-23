@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.util.Calendar;
 
+import edu.ucsd.cse110.successorator.lib.domain.AppMode;
+
 public class TimeUtilsTest {
 
     // Test generated with GPT4, but checked for correctness by me
@@ -107,5 +109,29 @@ public class TimeUtilsTest {
         assertTrue(TimeUtils.shouldShowIncompleteGoal(yesterday, now));
         assertFalse(TimeUtils.shouldShowIncompleteGoal(today, now));
         assertFalse(TimeUtils.shouldShowIncompleteGoal(tomorrow, now));
+    }
+
+    @Test
+    public void generateTitleString() {
+        var localizedCalendar = Calendar.getInstance(TimeUtils.GMT);
+        var now = TimeUtils.localize(TimeUtils.START_TIME, localizedCalendar);
+        // Verify that the current date string is correct
+        var currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
+        assertEquals("Today, Wed 2/7", currentDateString);
+        // advance 9 hours and verify no change
+        now.add(Calendar.HOUR_OF_DAY, 9);
+        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
+        assertEquals("Today, Wed 2/7", currentDateString);
+        // Advance another 2 and verify change
+        now.add(Calendar.HOUR_OF_DAY, 2);
+        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TODAY);
+        assertEquals("Today, Thu 2/8", currentDateString);
+        // Now test different app modes
+        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.PENDING);
+        assertEquals("Pending", currentDateString);
+        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.TOMORROW);
+        assertEquals("Tomorrow, Fri 2/9", currentDateString);
+        currentDateString = TimeUtils.generateTitleString(localizedCalendar, now, AppMode.RECURRING);
+        assertEquals("Recurring", currentDateString);
     }
 }

@@ -3,6 +3,10 @@ package edu.ucsd.cse110.successorator;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
+import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
@@ -44,10 +48,9 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Long> currentRealDate;
     private final MutableSubject<Long> currentDate;
     private final MutableSubject<Calendar> currentDateLocalized;
-    private final MutableSubject<String> currentDateString;
-    private String tomorrowDateString;
+    private final MutableSubject<String> currentTitleString;
     private final MutableSubject<Context> currentContext;
-    AppMode currentMode;
+    private final MutableSubject<AppMode> currentMode;
     private final Calendar dateConverter;
 
     public static final ViewModelInitializer<MainViewModel> initializer = new ViewModelInitializer<>(MainViewModel.class, creationExtras -> {
@@ -78,7 +81,10 @@ public class MainViewModel extends ViewModel {
 
         this.currentDate = new SimpleSubject<>();
         this.currentDateLocalized = new SimpleSubject<>();
-        this.currentDateString = new SimpleSubject<>();
+        this.currentTitleString = new SimpleSubject<>();
+
+        this.currentMode = new SimpleSubject<>();
+        this.currentMode.setValue(AppMode.TODAY);
 
         this.currentContext = new SimpleSubject<>();
         this.currentContext.setValue(Context.NONE);
@@ -101,16 +107,16 @@ public class MainViewModel extends ViewModel {
         });
         this.currentDateLocalized.observe(localized -> {
             if (localized == null) return;
+            var appMode = this.currentMode.getValue();
+            if (appMode == null) return;
             //can freely change display date
-            var displayDate = (Calendar) localized.clone();
-            if (displayDate.get(Calendar.HOUR_OF_DAY) < 2) {
-                displayDate.add(Calendar.DAY_OF_YEAR, -1);
-            }
-            SimpleDateFormat formatter = new SimpleDateFormat("EEE M/d", Locale.US);
-            formatter.setCalendar(dateConverter);
-            this.currentDateString.setValue(formatter.format(displayDate.getTime()));
-            displayDate.add(Calendar.DATE, 1);
-            this.tomorrowDateString = formatter.format(displayDate.getTime());
+            this.currentTitleString.setValue(TimeUtils.generateTitleString(dateConverter, localized, appMode));
+        });
+        this.currentMode.observe(appMode -> {
+            if (appMode == null) return;
+            var localized = this.currentDateLocalized.getValue();
+            if (localized == null) return;
+            this.currentTitleString.setValue(TimeUtils.generateTitleString(dateConverter, localized, appMode));
         });
 
         this.orderedGoals = new SimpleSubject<>();
@@ -187,9 +193,9 @@ public class MainViewModel extends ViewModel {
             var filteredGoals = goals.stream().filter(goal -> filter.shouldShow(goal, nowLocalized)).collect(Collectors.toList());
             this.goalsToDisplay.setValue(filteredGoals);
         });
-
-        this.currentMode = AppMode.TODAY;
     }
+
+
 
     public void advance24Hours() {
         Long offset = dateOffset.getValue();
@@ -201,10 +207,9 @@ public class MainViewModel extends ViewModel {
         dateOffset.setValue(offset);
     }
 
-    public Subject<String> getCurrentDateString() {
-        return currentDateString;
+    public Subject<String> getCurrentTitleString() {
+        return currentTitleString;
     }
-    public String getTomorrowDateString() { return this.tomorrowDateString; }
 
     public void pressGoal(int goalId) {
         var goal = goalRepository.findGoal(goalId);
@@ -236,25 +241,25 @@ public class MainViewModel extends ViewModel {
     public void activateTodayView() {
         this.goalSorter.setValue(new DefaultGoalSorter());
         this.goalFilter.setValue(new TodayGoalFilter());
-        this.currentMode = AppMode.TODAY;
+        this.currentMode.setValue(TODAY);
     }
 
     public void activateTomorrowView() {
         this.goalSorter.setValue(new DefaultGoalSorter());
         this.goalFilter.setValue(new TomorrowGoalFilter());
-        this.currentMode = AppMode.TOMORROW;
+        this.currentMode.setValue(TOMORROW);
     }
 
     public void activatePendingView() {
         this.goalSorter.setValue(new PendingGoalSorter());
         this.goalFilter.setValue(new PendingGoalFilter());
-        this.currentMode = AppMode.PENDING;
+        this.currentMode.setValue(PENDING);
     }
 
     public void activateRecurringView() {
         this.goalSorter.setValue(new RecurringGoalSorter());
         this.goalFilter.setValue(new RecurringGoalFilter());
-        this.currentMode = AppMode.RECURRING;
+        this.currentMode.setValue(AppMode.RECURRING);
     }
 
     public Subject<List<Goal>> getGoalsToDisplay() {
@@ -269,9 +274,5 @@ public class MainViewModel extends ViewModel {
         if (currentTime == null) return;
         var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime);
         goalRepository.append(newGoal);
-    }
-
-    public Calendar getDateConverter() {
-        return dateConverter;
     }
 }

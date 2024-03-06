@@ -159,41 +159,40 @@ public class MainViewModelTest {
         assertCompleteCount(0);
     }
 
-    // Pretty much tests US2 scenarios 1 and 2 as well (just differnt time increments).
+    // This is distinct from the TimeUtilsTest because it tests the integration of the MainViewModel
     @Test
     public void getCurrentDateString() {
         // Verify that the current date string is correct
-        var currentDateString = mainViewModel.getCurrentDateString().getValue();
+        var currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wed 2/7", currentDateString);
+        assertEquals("Today, Wed 2/7", currentDateString);
         // advance 9 hours and verify no change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
-        currentDateString = mainViewModel.getCurrentDateString().getValue();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Wed 2/7", currentDateString);
+        assertEquals("Today, Wed 2/7", currentDateString);
         // Advance another 2 and verify change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
-        currentDateString = mainViewModel.getCurrentDateString().getValue();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
-        assertEquals("Thu 2/8", currentDateString);
-    }
-
-    @Test
-    public void getTomorrowDateString() {
-        // Verify that the current date string is correct
-        var tomorrowDateString = mainViewModel.getTomorrowDateString();
-        assertNotNull(tomorrowDateString);
-        assertEquals("Thu 2/8", tomorrowDateString);
-        // advance 9 hours and verify no change
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
-        tomorrowDateString = mainViewModel.getTomorrowDateString();
-        assertNotNull(tomorrowDateString);
-        assertEquals("Thu 2/8", tomorrowDateString);
-        // Advance another 2 and verify change
-        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
-        tomorrowDateString = mainViewModel.getTomorrowDateString();
-        assertNotNull(tomorrowDateString);
-        assertEquals("Fri 2/9", tomorrowDateString);
+        assertEquals("Today, Thu 2/8", currentDateString);
+        // Now test different app modes
+        mainViewModel.activatePendingView();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Pending", currentDateString);
+        mainViewModel.activateTomorrowView();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Tomorrow, Fri 2/9", currentDateString);
+        mainViewModel.activateRecurringView();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Recurring", currentDateString);
+        mainViewModel.activateTodayView();
+        currentDateString = mainViewModel.getCurrentTitleString().getValue();
+        assertNotNull(currentDateString);
+        assertEquals("Today, Thu 2/8", currentDateString);
     }
 
     @Test
