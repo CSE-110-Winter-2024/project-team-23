@@ -12,9 +12,9 @@ public interface GoalRepository {
 
     void update(Goal goal);
 
-    void prepend(Goal goal);
+    int prepend(Goal goal);
 
-    void append(Goal goal);
+    int append(Goal goal);
 
     void remove(int id);
 }
