@@ -5,5 +5,5 @@ public enum RecurrenceType {
     DAILY,
     WEEKLY,
     MONTHLY,
-    YEARLY
+    YEARLY,
 }

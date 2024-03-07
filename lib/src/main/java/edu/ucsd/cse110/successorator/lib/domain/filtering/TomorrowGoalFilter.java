@@ -10,7 +10,7 @@ public class TomorrowGoalFilter implements IGoalFilter {
     @Override
     public boolean shouldShow(Goal goal, Calendar now) {
         // If pending do not show
-        if(goal.pending()) return false;
+        if(goal.pending() || goal.recurring()) return false;
         // Since now is localized we can use that instead of dateConverter
         var completionTime = TimeUtils.localize(goal.completionDate(), now);
         var startTime = TimeUtils.localize(goal.startDate(), now);
@@ -18,10 +18,8 @@ public class TomorrowGoalFilter implements IGoalFilter {
         // shouldShowRecurring says it should show up tomorrow, then it should show up
         var tomorrow = (Calendar) now.clone();
         tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-
-        if(goal.recurring()) {
-            return TimeUtils.shouldShowRecurring(goal.recurrenceType(), now, startTime, tomorrow);
-        }
+        // If pending do not show
+        // Since now is localized we can use that instead of dateConverter
         // Since we assume the goal got completed "today", tomorrow we don't show it if the start
         // time is before "tomorrow"
 
