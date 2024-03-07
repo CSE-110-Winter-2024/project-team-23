@@ -324,6 +324,32 @@ public class MainViewModelTest {
     }
 
     @Test
+    public void ScenarioBasedSystemTests1() {
+        //Steps 1 to 7
+        //Add one time by default goal, WIP make context Home
+        mainViewModel.addGoal("Go to party tonight");
+        mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
+        assertPresence(1, true);
+        assertPresence(2, true);
+        assertCompleteCount(3);
+
+        //Steps 8 to 14
+        mainViewModel.activateTomorrowView();
+        //Add one time by default goal, WIP make context Home
+        mainViewModel.addGoal("Install game update");
+        mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
+        assertCompleteCount(1);
+
+        //Steps 15 to 24
+        mainViewModel.activatePendingView();
+        mainViewModel.addGoal("Research job market");
+        mainViewModel.activateRecurringView();
+        mainViewModel.addRecurringGoal("Visit Goal", 2025, 1, 20, RecurrenceType.YEARLY, Context.HOME);
+        assertCompleteCount(0);
+
+    }
+
+    @Test
     public void addRecurringGoal() {
         // Add a goal in the past
         assertFalse(mainViewModel.addRecurringGoal("Recurring Goal", 2020, 2, 7, RecurrenceType.DAILY, Context.HOME));
