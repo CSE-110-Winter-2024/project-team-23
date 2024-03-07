@@ -323,31 +323,70 @@ public class MainViewModelTest {
         assertCompleteCount(3);
     }
 
+    //Based off of the ones written on the master doc
+    //Test 1: Creating various goals (UI testing)
     @Test
     public void ScenarioBasedSystemTests1() {
+
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
         //Steps 1 to 7
         //Add one time by default goal, WIP make context Home
         mainViewModel.addGoal("Go to party tonight");
         mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
         assertPresence(1, true);
-        assertPresence(2, true);
-        assertCompleteCount(3);
+        assertCompleteCount(0);
+        assertIncompleteCount(2);
 
         //Steps 8 to 14
         mainViewModel.activateTomorrowView();
         //Add one time by default goal, WIP make context Home
         mainViewModel.addGoal("Install game update");
         mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
-        assertCompleteCount(1);
+        assertCompleteCount(0);
+        assertIncompleteCount(1);
 
         //Steps 15 to 24
         mainViewModel.activatePendingView();
         mainViewModel.addGoal("Research job market");
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
         mainViewModel.activateRecurringView();
         mainViewModel.addRecurringGoal("Visit Goal", 2025, 1, 20, RecurrenceType.YEARLY, Context.HOME);
         assertCompleteCount(0);
+        assertIncompleteCount(3);
 
     }
+
+    //Test 2: Time handling: Clearing finished goals and keeping recurring goals
+    @Test
+    public void ScenarioBasedSystemTests2() {
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Steps to...
+
+    }
+
+    //Test 3: Correctly display, filter and order goals
+    @Test
+    public void ScenarioBasedSystemTests3() {
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Steps to....
+
+        mainViewModel.addGoal("work", Context.WORK);
+
+    }
+
 
     @Test
     public void addRecurringGoal() {
