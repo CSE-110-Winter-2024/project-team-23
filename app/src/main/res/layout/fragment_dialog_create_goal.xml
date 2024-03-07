@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
+        android:id="@+id/contextRadio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -27,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@+id/goal_input">
 
         <RadioButton
-            android:id="@+id/homebutton"
+            android:id="@+id/homeButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="10dp"
@@ -38,7 +39,7 @@
             android:textSize="30sp" />
 
         <RadioButton
-            android:id="@+id/workbutton"
+            android:id="@+id/workButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="10dp"
@@ -49,7 +50,7 @@
             android:textSize="30sp" />
 
         <RadioButton
-            android:id="@+id/schoolbutton"
+            android:id="@+id/schoolButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="10dp"
@@ -60,7 +61,7 @@
             android:textSize="30sp" />
 
         <RadioButton
-            android:id="@+id/errandsbutton"
+            android:id="@+id/errandsButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="10dp"

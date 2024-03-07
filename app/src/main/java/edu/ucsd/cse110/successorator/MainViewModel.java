@@ -257,12 +257,13 @@ public class MainViewModel extends ViewModel {
     }
 
 
-    public void addGoal(String contents) {
+    public void addGoal(String contents, Context context) {
         // We could use a proper value for the completion date, but we don't really care about it
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
-        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime);
+        var newGoal = new Goal(null, contents, 0, false, currentTime, false,
+                false, RecurrenceType.NONE, context, currentTime);
         goalRepository.append(newGoal);
     }
 

@@ -24,6 +24,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
 
+    private Context context;
+
     public CreateGoalDialogFragment() {
         // Required empty public constructor
     }
@@ -45,24 +47,24 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.mainViewModel = modelProvider.get(MainViewModel.class);
     }
 
-    void contextButtonSelected(Context c) {
-        switch (c) {
-            case HOME:
-
-                break;
-            case WORK:
-                break;
-            case SCHOOL:
-                break;
-            case ERRANDS:
-                break;
-        }
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
+
+
+        // Create listener for context buttons
+        this.view.contextRadio.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == this.view.homeButton.getId()) {
+                this.context = Context.HOME;
+            } else if (checkedId == this.view.workButton.getId()) {
+                this.context = Context.WORK;
+            } else if (checkedId == this.view.schoolButton.getId()) {
+                this.context = Context.SCHOOL;
+            } else if (checkedId == this.view.errandsButton.getId()) {
+                this.context = Context.ERRANDS;
+            }
+        });
 
         //Create listener for enter key.
         //Interface containing method called anytime enter key is pressed.
@@ -72,7 +74,15 @@ public class CreateGoalDialogFragment extends DialogFragment {
             //Unnecessary now but futureproofs for multiple textboxes with the same listener.
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 String content = view.goalInput.getText().toString();
-                mainViewModel.addGoal(content);
+
+                if (content.length() == 0) {
+                    throw new IllegalArgumentException("Goal content cannot " +
+                            "be empty");
+                } else if (context == null) {
+                    throw new IllegalArgumentException("Context must be selected");
+                }
+
+                mainViewModel.addGoal(content, context);
                 //Lambda functions allow for usage of this. in interface declaration.
                 //Interestingly, without it dismiss() appears to call the correct function regardless.
                 this.dismiss();
