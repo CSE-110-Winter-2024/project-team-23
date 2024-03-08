@@ -45,19 +45,6 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.mainViewModel = modelProvider.get(MainViewModel.class);
     }
 
-    void contextButtonSelected(Context c) {
-        switch (c) {
-            case HOME:
-
-                break;
-            case WORK:
-                break;
-            case SCHOOL:
-                break;
-            case ERRANDS:
-                break;
-        }
-    }
 
     @NonNull
     @Override
