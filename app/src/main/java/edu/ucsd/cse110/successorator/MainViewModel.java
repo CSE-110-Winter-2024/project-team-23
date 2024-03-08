@@ -246,7 +246,6 @@ public class MainViewModel extends ViewModel {
     }
 
 
-
     public void advance24Hours() {
         Long offset = dateOffset.getValue();
         if (offset == null) {
