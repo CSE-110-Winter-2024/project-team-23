@@ -527,7 +527,30 @@ public class MainViewModel extends ViewModel {
     }
 
     public void deleteRecurringGoal(int goalId) {
-        // We were explicitly told in clarifications not to delete generated goals
+        // We were explicitly told in clarifications to not delete generated goals if in
+        // today or tomorrow
+        var recurringGoal = goalRepository.findGoal(goalId);
+        if (recurringGoal == null || !recurringGoal.recurring()) return;
+        // Don't need to check prevGoal instance; it is always either not visible (don't care)
+        // or is visible (must keep)
         this.goalRepository.remove(goalId);
+
+        var nextId = recurringGoal.nextId();
+
+        if (nextId != null) {
+            var nextGoal = goalRepository.findGoal(nextId);
+            if (nextGoal != null) {
+                // If next goal should be visible tomorrow
+                // We need to remove it
+                var tomorrowFilter = new TomorrowGoalFilter();
+                var nowLocalized = currentDateLocalized.getValue();
+                if (nowLocalized == null) return;
+                if (!tomorrowFilter.shouldShow(nextGoal, nowLocalized)) {
+                    this.goalRepository.remove(nextId);
+                }
+            }
+        }
+
+
     }
 }
