@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.Calendar;
 
+import edu.ucsd.cse110.successorator.lib.domain.Context;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
@@ -124,7 +125,7 @@ public class MainViewModelTest {
     @Test
     public void addGoal() {
         // Add a new goal
-        mainViewModel.addGoal("Goal 9");
+        mainViewModel.addGoal("Goal 9", Context.HOME);
         // Verify that the new goal is displayed
         assertPresence(9, true);
         assertPresenceInIncomplete(9, true);
@@ -137,7 +138,6 @@ public class MainViewModelTest {
         assertEquals((Long) TimeUtils.START_TIME, goal.startDate());
         assertFalse(goal.completed());
         assertEquals("Goal 9", goal.content());
-
     }
 
     @Test
@@ -245,7 +245,7 @@ public class MainViewModelTest {
     @Test
     public void Iteration1Integration1() {
         //
-        mainViewModel.addGoal("meow");
+        mainViewModel.addGoal("meow", Context.HOME);
         assertIncompleteCount(4);
         assertPresenceInIncomplete(9, true);
         var goalsToDisplay = mainViewModel.getGoalsToDisplay().getValue();
@@ -270,5 +270,25 @@ public class MainViewModelTest {
         assertIncompleteCount(3);
         assertPresence(1, true);
         assertCompleteCount(3);
+    }
+
+    @Test
+    public void addGoalWithContext() {
+        mainViewModel.addGoal("foo", Context.HOME);
+        var goalsToDisplay = mainViewModel.getGoalsToDisplay().getValue();
+        var goal = goalsToDisplay.stream().filter(g -> g.content().equals("foo")).findFirst().orElse(null);
+        assertNotNull(goal);
+        assertEquals(Context.HOME, goal.context());
+    }
+
+    @Test
+    public void addGoalWithWithContextInRepo() {
+        mainViewModel.addGoal("foo", Context.HOME);
+        var goalsToDisplay = mainViewModel.getGoalsToDisplay().getValue();
+        var goal = goalsToDisplay.stream().filter(g -> g.content().equals("foo")).findFirst().orElse(null);
+        assertNotNull(goal);
+        var repoGoal = goalRepository.findGoal(goal.id());
+        assertNotNull(repoGoal);
+        assertEquals(Context.HOME, repoGoal.context());
     }
 }
