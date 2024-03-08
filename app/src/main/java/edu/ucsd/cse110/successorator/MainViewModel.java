@@ -10,12 +10,10 @@ import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -417,7 +415,7 @@ public class MainViewModel extends ViewModel {
         goalRepository.append(newGoal);
     }
 
-    public void addGoal(String contents, Context context) {
+    public void addGoalWithContext(String contents, Context context) {
         // We could use a proper value for the completion date, but we don't really care about it
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();

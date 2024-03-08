@@ -8,10 +8,8 @@ import org.junit.Test;
 
 import java.util.Calendar;
 
-import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
-import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
@@ -335,7 +333,7 @@ public class MainViewModelTest {
 
         //Steps 1 to 7
         //Add one time goal with Home context
-        mainViewModel.addGoal("Go to party tonight", Context.HOME);
+        mainViewModel.addGoalWithContext("Go to party tonight", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
         assertPresence(1, true);
         assertCompleteCount(0);
@@ -344,7 +342,7 @@ public class MainViewModelTest {
         //Steps 8 to 14
         mainViewModel.activateTomorrowView();
         //Add one time goal with Home context
-        mainViewModel.addGoal("Install game update", Context.HOME);
+        mainViewModel.addGoalWithContext("Install game update", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
         assertCompleteCount(0);
         assertIncompleteCount(1);
@@ -464,10 +462,10 @@ public class MainViewModelTest {
 
         //Steps 1 to 8
 
-        mainViewModel.addGoal("work", Context.WORK);
-        mainViewModel.addGoal("home", Context.HOME);
-        mainViewModel.addGoal("errands", Context.ERRANDS);
-        mainViewModel.addGoal("school", Context.SCHOOL);
+        mainViewModel.addGoalWithContext("work", Context.WORK);
+        mainViewModel.addGoalWithContext("home", Context.HOME);
+        mainViewModel.addGoalWithContext("errands", Context.ERRANDS);
+        mainViewModel.addGoalWithContext("school", Context.SCHOOL);
         assertCompleteCount(0);
         assertIncompleteCount(4);
 
