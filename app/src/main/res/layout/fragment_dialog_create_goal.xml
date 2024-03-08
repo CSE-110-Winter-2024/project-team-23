@@ -9,12 +9,13 @@
         android:id="@+id/goal_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:importantForAutofill="no"
         android:ems="10"
         android:hint="@string/input_box_hint"
         android:imeOptions="actionDone"
+        android:importantForAutofill="no"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,7 +70,7 @@
             android:background="@drawable/errands_context_radio"
             android:button="@null"
             android:buttonTint="#DDECD2"
-            android:paddingLeft="27dp"
+            android:paddingLeft="25dp"
             android:text="@string/errands"
             android:textSize="30sp" />
     </RadioGroup>
@@ -82,7 +83,7 @@
         android:layout_marginTop="96dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/goal_input">
 
@@ -144,17 +145,24 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/datePickerButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Pick Date"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/YearlyRecurringGoalButton" />
-
     </RadioGroup>
+
+    <EditText
+        android:id="@+id/recurring_date_picker"
+        android:layout_width="122dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="4dp"
+        android:ems="10"
+        android:hint="@string/date_box_hint"
+        android:imeOptions="actionDone"
+        android:importantForAutofill="no"
+        android:inputType="date"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
 
     <!--Uses https://www.youtube.com/watch?v=m7TJha6zlN0 as a guide to the buttons-->
