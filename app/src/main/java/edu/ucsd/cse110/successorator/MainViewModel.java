@@ -431,6 +431,9 @@ public class MainViewModel extends ViewModel {
         var selectedDate = (Calendar) currentTime.clone();
         // Set at 12:00 PM to avoid 2am edge cases
         selectedDate.set(year, month, day, 12, 0, 0);
+        if (selectedDate.get(Calendar.DAY_OF_MONTH) == day && selectedDate.get(Calendar.YEAR) == year && selectedDate.get(Calendar.MONTH) == month) {
+            return false;
+        }
         currentTime = TimeUtils.twoAMNormalized(currentTime);
         if (selectedDate.before(currentTime)) return false;
         var selectedMoment = selectedDate.getTimeInMillis();
@@ -529,5 +532,9 @@ public class MainViewModel extends ViewModel {
     public void deleteRecurringGoal(int goalId) {
         // We were explicitly told in clarifications not to delete generated goals
         this.goalRepository.remove(goalId);
+    }
+
+    public AppMode getCurrentMode() {
+        return currentMode.getValue();
     }
 }

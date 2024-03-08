@@ -4,7 +4,7 @@
     <string name="hello_world">Hello, World!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="input_box_hint">Write Goal Here</string>
-    <string name="date_box_hint">xx/xx/xx</string>
+    <string name="date_box_hint">Month/Day/Year</string>
     <string name="no_goals">No goals for the Day.  Click the + at the upper right to enter your Most Important Thing.</string>
     <string name="errands">E</string>
     <string name="home">H</string>

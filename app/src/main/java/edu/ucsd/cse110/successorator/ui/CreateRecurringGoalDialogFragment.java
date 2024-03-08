@@ -14,13 +14,15 @@ import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateRecurringGoalBinding;
+import edu.ucsd.cse110.successorator.lib.domain.Context;
+import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 
 public class CreateRecurringGoalDialogFragment extends DialogFragment {
     private FragmentDialogCreateRecurringGoalBinding view;
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
-
+    private RecurrenceType recurrenceType;
     public CreateRecurringGoalDialogFragment() {
         // Required empty public constructor
     }
@@ -47,18 +49,46 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateRecurringGoalBinding.inflate(getLayoutInflater());
 
+        // Create listener for context buttons
+        this.view.recurrenceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == this.view.dailyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.DAILY;
+            } else if (checkedId == this.view.weeklyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.WEEKLY;
+            } else if (checkedId == this.view.monthlyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.MONTHLY;
+            } else if (checkedId == this.view.yearlyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.YEARLY;
+            }
+        });
+
         //Create listener for enter key.
         //Interface containing method called anytime enter key is pressed.
         //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm
         TextView.OnEditorActionListener editListener = (v, actionId, event) -> {
             //actionId determined in corresponding xml file.
             //Unnecessary now but futureproofs for multiple textboxes with the same listener.
-            if(actionId == EditorInfo.IME_ACTION_DONE){
-                String content = view.goalInput.getText().toString();
-                mainViewModel.addGoal(content);
-                //Lambda functions allow for usage of this. in interface declaration.
-                //Interestingly, without it dismiss() appears to call the correct function regardless.
-                this.dismiss();
+
+            String[] parts = view.recurringDatePicker.getText().toString().split("/");
+            if (parts.length == 3) {
+                int[] ymd = new int[3];
+                ymd[0] = Integer.parseInt(parts[2]); // Year
+                ymd[1] = Integer.parseInt(parts[0]); // Month
+                ymd[2] = Integer.parseInt(parts[1]); // Day
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    String content = view.goalInput.getText().toString();
+                    if (view.recurringDatePicker.length() == 0){
+                        mainViewModel.addRecurringGoalDateless(content,recurrenceType, Context.HOME);
+                    } else {
+                        //Context is defaulted to HOME, Needs US3 to be implemented.
+                        mainViewModel.addRecurringGoal(content,ymd[0], ymd[1]-1, ymd[2], recurrenceType, Context.HOME);
+                    }
+
+                    //Lambda functions allow for usage of this. in interface declaration.
+                    //Interestingly, without it dismiss() appears to call the correct function regardless.
+                    this.dismiss();
+                }
             }
             return false;
         };

@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
         //Home screen menu items
         if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
-            if (appMode.equals(RECURRING)) {
+            if (mainViewModel.getCurrentMode() == AppMode.RECURRING){
                 var dialogFragment = CreateRecurringGoalDialogFragment.newInstance();
-                dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+                dialogFragment.show(getSupportFragmentManager(), "CreateRecurringGoalDialogFragment");
             } else {
                 var dialogFragment = CreateGoalDialogFragment.newInstance();
                 dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
