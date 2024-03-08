@@ -75,11 +75,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 String content = view.goalInput.getText().toString();
 
-                if (content.length() == 0) {
-                    throw new IllegalArgumentException("Goal content cannot " +
-                            "be empty");
-                } else if (context == null) {
-                    throw new IllegalArgumentException("Context must be selected");
+                if (context == null) {
+                    return false;
                 }
 
                 mainViewModel.addGoal(content, context);
