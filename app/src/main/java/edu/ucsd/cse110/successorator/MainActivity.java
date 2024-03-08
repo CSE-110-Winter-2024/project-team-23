@@ -26,6 +26,7 @@ import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.CreateRecurringGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -108,8 +109,13 @@ public class MainActivity extends AppCompatActivity {
         //Home screen menu items
         if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
-            dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+            if (appMode.equals(RECURRING)) {
+                var dialogFragment = CreateRecurringGoalDialogFragment.newInstance();
+                dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+            } else {
+                var dialogFragment = CreateGoalDialogFragment.newInstance();
+                dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+            }
         }
         else if (itemId == R.id.change_view_menu) {
             View anchor = this.findViewById(R.id.change_view_menu);
