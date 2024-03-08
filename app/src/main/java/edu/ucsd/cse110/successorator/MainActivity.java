@@ -2,11 +2,6 @@ package edu.ucsd.cse110.successorator;
 
 
 
-import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
-import static edu.ucsd.cse110.successorator.lib.domain.AppMode.RECURRING;
-import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
-import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
-
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private MainViewModel mainViewModel;
     private ActivityMainBinding view;
     private GoalListAdapter listAdapter;
-    private String dateString;
-    private String tomorrowString;
-    private AppMode appMode = TODAY;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,10 +68,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Initialize Title
-        dateString = mainViewModel.getCurrentDateString().getValue();
-        updateTitle();
-
         setContentView(view.getRoot());
 
     }
@@ -91,13 +79,9 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.mainViewModel.getCurrentDateString().observe(str -> {
+        this.mainViewModel.getCurrentTitleString().observe(str -> {
             if (str == null) return;
-            dateString = str;
-            //Extra observer unnecessary bloat
-            tomorrowString = mainViewModel.getTomorrowDateString();
-            updateTitle();
-            //getSupportActionBar().setTitle(str);
+            getSupportActionBar().setTitle(str);
         });
         return true;
     }
@@ -139,40 +123,15 @@ public class MainActivity extends AppCompatActivity {
         boolean clicked = true;
         if (itemId == R.id.today_popup) {
             this.mainViewModel.activateTodayView();
-            this.appMode = TODAY;
         } else if (itemId == R.id.tomorrow_popup){
             this.mainViewModel.activateTomorrowView();
-            this.appMode = TOMORROW;
         } else if (itemId == R.id.pending_popup){
             this.mainViewModel.activatePendingView();
-            this.appMode = PENDING;
         } else if (itemId == R.id.recurring_popup){
             this.mainViewModel.activateRecurringView();
-            this.appMode = RECURRING;
         } else {
             clicked = false;
         }
-        updateTitle();
         return clicked;
-    }
-
-    public void updateTitle(){
-        if(appMode.equals(TODAY)){
-            getSupportActionBar().setTitle("Today, " + dateString);
-        } else if(appMode.equals(TOMORROW)){
-            getSupportActionBar().setTitle("Tomorrow, " + tomorrowString);
-        } else if(appMode.equals(PENDING)){
-            getSupportActionBar().setTitle("Pending");
-        } else {
-            getSupportActionBar().setTitle("Recurring");
-        }
-    }
-
-    //Testing methods
-    public void setAppMode(AppMode appMode){
-        this.appMode = appMode;
-    }
-    public MainViewModel getMainViewModel(){
-        return mainViewModel;
     }
 }

@@ -70,10 +70,11 @@
             android:background="@drawable/errands_context_radio"
             android:button="@null"
             android:buttonTint="#DDECD2"
-            android:paddingLeft="25dp"
+            android:paddingLeft="27dp"
             android:text="@string/errands"
             android:textSize="30sp" />
     </RadioGroup>
+
 
 
     <RadioGroup
@@ -138,8 +139,5 @@
             app:layout_constraintTop_toBottomOf="@+id/MonthlyRecurringGoalButton" />
 
     </RadioGroup>
-
-
-    <!--Uses https://www.youtube.com/watch?v=m7TJha6zlN0 as a guide to the buttons-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
