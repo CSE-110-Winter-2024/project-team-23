@@ -673,4 +673,246 @@ public class MainViewModelTest {
         assertIncompleteCount(0);
         assertCompleteCount(1);
     }
+
+    @Test
+    public void MS2_US6Scenario1() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2024, 1, 7, RecurrenceType.DAILY, Context.HOME);
+        mainViewModel.addRecurringGoal("Weekly Goal", 2024, 1, 7, RecurrenceType.WEEKLY, Context.HOME);
+
+        // checking if the goals show up on the recurring tab
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(2);
+
+        mainViewModel.activateTodayView();
+
+        //advance a week and check the today, tomorrow, and recurring tabs
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 7);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(2);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(2);
+
+
+    }
+
+    @Test
+    public void MS2_US6Scenario2() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Weekly Goal", 2024, 1, 7, RecurrenceType.WEEKLY, Context.HOME);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+
+        // advance to 3/4/24 (First Wednesday of the Month)
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 28);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+    }
+    @Test
+    public void MS2_US6Scenario3() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Yearly Goal", 2024, 1, 7, RecurrenceType.YEARLY, Context.HOME);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+
+        // advance a year (takes the leap year into account)
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 366);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+    }
+
+    @Test
+    public void MS2_US6Scenario5() {
+        // create a goal for 2 days from now
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+
+        //advance a day and check tmr view
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1);
+    }
+
+    @Test
+    public void MS2_US6Scenario6() {
+        // Delete Recurring Goal
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+        MutableSubject<Goal> goal =
+                goalRepository.goals.stream().filter(g -> g.getValue().content().equals("Daily Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+        assertEquals(goal.getValue().content(), "Daily Goal");
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+
+        mainViewModel.deleteRecurringGoal(goal.getValue().id());
+
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(0);
+    }
+
+    @Test
+    public void MS2_US6Scenario7() {
+        // Don't duplicate incomplete goals
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+        MutableSubject<Goal> goal =
+                goalRepository.goals.stream().filter(g -> g.getValue().content().equals("Daily Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+        assertEquals(goal.getValue().content(), "Daily Goal");
+
+        mainViewModel.advance24Hours();
+        mainViewModel.advance24Hours();
+        mainViewModel.advance24Hours();
+
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateRecurringView();
+        assertIncompleteCount(1);
+    }
+
+
+    @Test
+    public void MS2_US6Scenario8() {
+        // Reject Past Dates
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2023, 1, 9, RecurrenceType.DAILY, Context.HOME);
+        MutableSubject<Goal> goal =
+                goalRepository.goals.stream().filter(g -> g.getValue().content().equals("Daily Goal")).findFirst().orElse(null);
+        assertNull(goal);
+    }
+
+
+    @Test
+    public void MS2_US6Scenario9() {
+        // Leap year repeating goal
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Yearly Goal", 2024, 1, 29,
+                RecurrenceType.YEARLY, Context.HOME);
+
+
+        for (int i = 0; i < 22; i++) {
+            mainViewModel.advance24Hours();
+        }
+
+
+        Goal goal =
+                mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                        "Yearly Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+
+
+        mainViewModel.activateTodayView();
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(0);
+
+        for (int i = 0; i < 365; i++) {
+            mainViewModel.advance24Hours();
+        }
+
+        assertIncompleteCount(0);
+
+
+        mainViewModel.advance24Hours();
+        assertIncompleteCount(1);
+    }
+
+
+    @Test
+    public void MS2_US6Scenario10() {
+        // multiple instances of day recurring
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Daily Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+
+        for (int i = 0; i < 22; i++) {
+            mainViewModel.advance24Hours();
+        }
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1);
+
+        Goal goal =
+                mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                        "Daily Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTodayView();
+        goal =
+                mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                        "Daily Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        goal =
+                mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                        "Daily Goal")).findFirst().orElse(null);
+        assertNotNull(goal);
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(0);
+
+    }
 }
