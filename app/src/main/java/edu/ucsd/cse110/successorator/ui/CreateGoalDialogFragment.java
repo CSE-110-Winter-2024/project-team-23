@@ -24,6 +24,8 @@ public class CreateGoalDialogFragment extends DialogFragment {
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
 
+    private Context context;
+
     public CreateGoalDialogFragment() {
         // Required empty public constructor
     }
@@ -51,6 +53,20 @@ public class CreateGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
+
+        // Create listener for context buttons
+        this.view.contextRadio.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == this.view.homeButton.getId()) {
+                this.context = Context.HOME;
+            } else if (checkedId == this.view.workButton.getId()) {
+                this.context = Context.WORK;
+            } else if (checkedId == this.view.schoolButton.getId()) {
+                this.context = Context.SCHOOL;
+            } else if (checkedId == this.view.errandsButton.getId()) {
+                this.context = Context.ERRANDS;
+            }
+        });
+
         //Create listener for enter key.
         //Interface containing method called anytime enter key is pressed.
         //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm
@@ -59,7 +75,12 @@ public class CreateGoalDialogFragment extends DialogFragment {
             //Unnecessary now but futureproofs for multiple textboxes with the same listener.
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 String content = view.goalInput.getText().toString();
-                mainViewModel.addGoal(content);
+
+                if (context == null) {
+                    return false;
+                }
+
+                mainViewModel.addGoal(content, context);
                 //Lambda functions allow for usage of this. in interface declaration.
                 //Interestingly, without it dismiss() appears to call the correct function regardless.
                 this.dismiss();
