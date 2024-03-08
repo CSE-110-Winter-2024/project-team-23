@@ -339,6 +339,7 @@ public class MainViewModelTest {
         var repoGoal = goalRepository.findGoal(goal.id());
         assertNotNull(repoGoal);
         assertEquals(Context.HOME, repoGoal.context());
+    }
 
     //Based off of the ones written on the master doc
     //Test 1: Creating various goals (UI testing)
@@ -352,7 +353,7 @@ public class MainViewModelTest {
 
         //Steps 1 to 7
         //Add one time goal with Home context
-        mainViewModel.addGoalWithContext("Go to party tonight", Context.HOME);
+        mainViewModel.addGoal("Go to party tonight", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
         assertPresence(1, true);
         assertCompleteCount(0);
@@ -361,7 +362,7 @@ public class MainViewModelTest {
         //Steps 8 to 14
         mainViewModel.activateTomorrowView();
         //Add one time goal with Home context
-        mainViewModel.addGoalWithContext("Install game update", Context.HOME);
+        mainViewModel.addGoal("Install game update", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
         assertCompleteCount(0);
         assertIncompleteCount(1);
@@ -369,7 +370,7 @@ public class MainViewModelTest {
         //Steps 15 to 24
         mainViewModel.activatePendingView();
         //WIP does this really treat as pending? No
-        mainViewModel.addGoal("Research job market");
+        mainViewModel.addGoal("Research job market", Context.HOME);
         assertCompleteCount(0);
         assertIncompleteCount(0);
         mainViewModel.activateRecurringView();
@@ -400,7 +401,7 @@ public class MainViewModelTest {
         mainViewModel.activateTodayView();
         mainViewModel.addRecurringGoalDateless("push buttons on keyboard", RecurrenceType.DAILY, Context.HOME);
         mainViewModel.activatePendingView();
-        mainViewModel.addGoal("@everyone");
+        mainViewModel.addGoal("@everyone", Context.HOME);
         assertCompleteCount(0);
         assertIncompleteCount(0);
 
@@ -481,10 +482,10 @@ public class MainViewModelTest {
 
         //Steps 1 to 8
 
-        mainViewModel.addGoalWithContext("work", Context.WORK);
-        mainViewModel.addGoalWithContext("home", Context.HOME);
-        mainViewModel.addGoalWithContext("errands", Context.ERRANDS);
-        mainViewModel.addGoalWithContext("school", Context.SCHOOL);
+        mainViewModel.addGoal("work", Context.WORK);
+        mainViewModel.addGoal("home", Context.HOME);
+        mainViewModel.addGoal("errands", Context.ERRANDS);
+        mainViewModel.addGoal("school", Context.SCHOOL);
         assertCompleteCount(0);
         assertIncompleteCount(4);
 
