@@ -8,10 +8,8 @@ import org.junit.Test;
 
 import java.util.Calendar;
 
-import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
-import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.MockGoalRepository;
 import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
@@ -322,6 +320,161 @@ public class MainViewModelTest {
         assertPresence(1, true);
         assertCompleteCount(3);
     }
+
+    //Based off of the ones written on the master doc
+    //Test 1: Creating various goals (UI testing)
+    @Test
+    public void ScenarioBasedSystemTests1() {
+
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Steps 1 to 7
+        //Add one time goal with Home context
+        mainViewModel.addGoalWithContext("Go to party tonight", Context.HOME);
+        mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
+        assertPresence(1, true);
+        assertCompleteCount(0);
+        assertIncompleteCount(2);
+
+        //Steps 8 to 14
+        mainViewModel.activateTomorrowView();
+        //Add one time goal with Home context
+        mainViewModel.addGoalWithContext("Install game update", Context.HOME);
+        mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
+        assertCompleteCount(0);
+        assertIncompleteCount(1);
+
+        //Steps 15 to 24
+        mainViewModel.activatePendingView();
+        //WIP does this really treat as pending? No
+        mainViewModel.addGoal("Research job market");
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+        mainViewModel.activateRecurringView();
+        mainViewModel.addRecurringGoal("Visit Goal", 2025, 1, 20, RecurrenceType.YEARLY, Context.HOME);
+        assertCompleteCount(0);
+        assertIncompleteCount(3);
+
+    }
+
+    //Test 2: Time handling: Clearing finished goals and keeping recurring goals
+    @Test
+    public void ScenarioBasedSystemTests2() {
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Step 1
+        //Sets up time to be March 7th, 2024
+        dateTicker.setValue(TimeUtils.getStartTime()+TimeUtils.DAY_LENGTH*28);
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Steps 2 to 5
+        mainViewModel.activateTodayView();
+        mainViewModel.addRecurringGoalDateless("10km run", RecurrenceType.MONTHLY, Context.HOME);
+        mainViewModel.activateTomorrowView();
+        mainViewModel.addRecurringGoalDateless("    ", RecurrenceType.MONTHLY, Context.HOME);
+        mainViewModel.activateTodayView();
+        mainViewModel.addRecurringGoalDateless("push buttons on keyboard", RecurrenceType.DAILY, Context.HOME);
+        mainViewModel.activatePendingView();
+        mainViewModel.addGoal("@everyone");
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+
+        //Step 6
+        mainViewModel.activateTodayView();
+        var displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="10km run") {
+                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
+            }
+        }
+        mainViewModel.activateTomorrowView();
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="    ") {
+                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
+                break;
+            }
+        }
+
+        //Step 7, trying to complete a goal that shouldn't be
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+                assertFalse(mainViewModel.pressGoal(displayedGoals.get(i).id()));
+                break;
+            }
+        }
+
+        //Step 8
+        mainViewModel.activateTodayView();
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
+                break;
+            }
+        }
+        mainViewModel.activateTomorrowView();
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
+                break;
+            }
+        }
+
+        //Step 9 WIP pending behavior
+
+        //Step 10 to 12
+        mainViewModel.advance24Hours();
+        mainViewModel.activateTodayView();
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+
+        //For later after pending goal behaviors are done
+        //assertEquals(1, displayedGoals.size());
+        //assertTrue(displayedGoals.get(0).content()=="push buttons on keyboard");
+
+        mainViewModel.activateTomorrowView();
+        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        for (int i = 0; i < displayedGoals.size(); i++) {
+            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+                assertFalse(displayedGoals.get(i).completed());
+                break;
+            }
+        }
+
+
+    }
+
+    //Test 3: Correctly display, filter and order goals
+    @Test
+    public void ScenarioBasedSystemTests3() {
+        //Starts with cleared database
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        //Steps 1 to 8
+
+        mainViewModel.addGoalWithContext("work", Context.WORK);
+        mainViewModel.addGoalWithContext("home", Context.HOME);
+        mainViewModel.addGoalWithContext("errands", Context.ERRANDS);
+        mainViewModel.addGoalWithContext("school", Context.SCHOOL);
+        assertCompleteCount(0);
+        assertIncompleteCount(4);
+
+
+
+        //WIP logic to filter by context
+
+    }
+
 
     @Test
     public void addRecurringGoal() {

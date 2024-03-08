@@ -9,11 +9,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
+import edu.ucsd.cse110.successorator.lib.domain.Context;
 
 
 public class CreateGoalDialogFragment extends DialogFragment {
@@ -41,6 +44,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.mainViewModel = modelProvider.get(MainViewModel.class);
     }
+
 
     @NonNull
     @Override
