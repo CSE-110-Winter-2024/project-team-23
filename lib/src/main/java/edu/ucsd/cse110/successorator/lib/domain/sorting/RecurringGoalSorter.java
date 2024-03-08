@@ -6,6 +6,9 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 public class RecurringGoalSorter implements IGoalSorter {
     @Override
     public int compare(Goal a, Goal b) {
-        return 0;
+        // Compare start dates
+        var startA = a.startDate();
+        var startB = b.startDate();
+        return startA.compareTo(startB);
     }
 }

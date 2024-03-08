@@ -47,6 +47,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.mainViewModel = modelProvider.get(MainViewModel.class);
     }
 
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){

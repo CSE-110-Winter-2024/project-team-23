@@ -42,8 +42,20 @@ public class GoalEntity {
     @ColumnInfo(name = "startDate")
     public long startDate;
 
+    @ColumnInfo(name = "prevId")
+    public Integer prevId;
+
+    @ColumnInfo(name = "nextId")
+    public Integer nextId;
+
+    @ColumnInfo(name = "recurrenceId")
+    public Integer recurrenceId;
+
+    @ColumnInfo(name = "recurringGenerated")
+    public boolean recurringGenerated;
+
     public GoalEntity(@NonNull String content, int sortOrder,
-                      boolean completed, long  completionDate, long startDate, boolean pending, boolean recurring, RecurrenceType recurrenceType, Context context) {
+                      boolean completed, long  completionDate, long startDate, boolean pending, boolean recurring, RecurrenceType recurrenceType, Context context, Integer prevId, Integer nextId, Integer recurrenceId, boolean recurringGenerated) {
         this.content = content;
         this.sortOrder = sortOrder;
         this.completed = completed;
@@ -53,16 +65,20 @@ public class GoalEntity {
         this.recurrenceType = recurrenceType;
         this.context = context;
         this.startDate = startDate;
+        this.prevId = prevId;
+        this.nextId = nextId;
+        this.recurrenceId = recurrenceId;
+        this.recurringGenerated = recurringGenerated;
     }
 
     public static GoalEntity fromGoal(Goal goal) {
         GoalEntity goalEntity = new GoalEntity(goal.content(), goal.sortOrder(),
-                goal.completed(), goal.completionDate(), goal.startDate(), goal.pending(), goal.recurring() , RecurrenceType.NONE, Context.HOME);
+                goal.completed(), goal.completionDate(), goal.startDate(), goal.pending(), goal.recurring() , RecurrenceType.NONE, Context.HOME, goal.prevId(), goal.nextId(), goal.recurrenceId(), goal.recurringGenerated());
         goalEntity.id = goal.id();
         return goalEntity;
     }
 
     public Goal toGoal() {
-        return new Goal(id, content, sortOrder, completed, completionDate, pending, recurring, recurrenceType, context, startDate);
+        return new Goal(id, content, sortOrder, completed, completionDate, pending, recurring, recurrenceType, context, startDate, prevId, nextId, recurrenceId, recurringGenerated);
     }
 }

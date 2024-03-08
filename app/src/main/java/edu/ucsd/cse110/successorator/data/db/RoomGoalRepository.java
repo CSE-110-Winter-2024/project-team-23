@@ -47,13 +47,13 @@ public class RoomGoalRepository implements GoalRepository {
     }
 
     @Override
-    public void prepend(Goal goal) {
-        goalDao.prepend(GoalEntity.fromGoal(goal));
+    public int prepend(Goal goal) {
+        return goalDao.prepend(GoalEntity.fromGoal(goal));
     }
 
     @Override
-    public void append(Goal goal) {
-        goalDao.append(GoalEntity.fromGoal(goal));
+    public int append(Goal goal) {
+        return goalDao.append(GoalEntity.fromGoal(goal));
     }
 
     @Override
