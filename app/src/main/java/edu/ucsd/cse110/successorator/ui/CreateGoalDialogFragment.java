@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
+import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
 
 
@@ -80,7 +81,13 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     return false;
                 }
 
-                mainViewModel.addGoal(content, context);
+                //If on pending view logic to make pending goal
+                if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+                    mainViewModel.addPendingGoal(content, context);
+                } else {
+                    mainViewModel.addGoal(content, context);
+                }
+
                 //Lambda functions allow for usage of this. in interface declaration.
                 //Interestingly, without it dismiss() appears to call the correct function regardless.
                 this.dismiss();

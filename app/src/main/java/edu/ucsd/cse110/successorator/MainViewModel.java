@@ -361,6 +361,8 @@ public class MainViewModel extends ViewModel {
         return currentDateString;
     }
 
+    public Subject<AppMode> getCurrentMode() { return currentMode;}
+
     // All testing for this method is accomplished via title strings and above functions
     private void updateCalendarStrings(AppMode appMode, Calendar localized) {
         var displayDate = (Calendar) localized.clone();
@@ -412,6 +414,13 @@ public class MainViewModel extends ViewModel {
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
         var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
+        goalRepository.append(newGoal);
+    }
+
+    public void addPendingGoal(String contents, Context context) {
+        var currentTime = this.currentDate.getValue();
+        if (currentTime == null) return;
+        var newGoal = new Goal(null, contents, 0, false, currentTime, true, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
         goalRepository.append(newGoal);
     }
 

@@ -72,6 +72,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         }
 
 
+
         return binding.getRoot();
     }
 
