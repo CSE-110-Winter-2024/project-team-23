@@ -411,7 +411,7 @@ public class MainViewModel extends ViewModel {
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
-        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime, null, null, null, false);
+        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
         goalRepository.append(newGoal);
     }
 
