@@ -71,19 +71,10 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
 
             String[] parts = view.recurringDatePicker.getText().toString().split("/");
             if (parts.length == 3) {
-                int[] ymd = new int[3];
-                ymd[0] = Integer.parseInt(parts[2]); // Year
-                ymd[1] = Integer.parseInt(parts[0]); // Month
-                ymd[2] = Integer.parseInt(parts[1]); // Day
-
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     String content = view.goalInput.getText().toString();
-                    if (view.recurringDatePicker.length() == 0){
-                        mainViewModel.addRecurringGoalDateless(content,recurrenceType, Context.HOME);
-                    } else {
-                        //Context is defaulted to HOME, Needs US3 to be implemented.
-                        mainViewModel.addRecurringGoal(content,ymd[0], ymd[1]-1, ymd[2], recurrenceType, Context.HOME);
-                    }
+                    //Context is defaulted to HOME, Needs US3 to be implemented.
+                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), recurrenceType, Context.HOME);
 
                     //Lambda functions allow for usage of this. in interface declaration.
                     //Interestingly, without it dismiss() appears to call the correct function regardless.
