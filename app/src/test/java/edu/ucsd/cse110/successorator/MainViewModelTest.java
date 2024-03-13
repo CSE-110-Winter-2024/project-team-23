@@ -915,4 +915,80 @@ public class MainViewModelTest {
         assertIncompleteCount(0);
 
     }
+
+    @Test
+    public void MS2_US8Scenario1() {
+        //Title: Moving goal to today
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
+        mainViewModel.activatePendingView();
+
+        //Tap and do nothing
+        //Tap and hold logic
+        //Select today, move pending goal to today logic
+        //assertIncompleteCount(1); //assert goal is not completed
+        //assert the goal's pending is now false
+        mainViewModel.activateTodayView();
+        //assert the goal is on Today view
+
+    }
+
+    @Test
+    public void MS2_US8Scenario2() {
+        //Title:  Moving goal to tomorrow
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addPendingGoal("Build furniture", Context.HOME);
+        mainViewModel.activatePendingView();
+
+        //Tap and do nothing
+        //Tap and hold logic
+        //Select tomorrow, move pending goal to tomorrow logic
+        //assertIncompleteCount(1); //assert goal is not completed
+        //assert the goal's pending is now false
+        mainViewModel.activateTomorrowView();
+        //assert the goal is on tomorrow view
+
+    }
+
+    @Test
+    public void MS2_US8Scenario3() {
+        //Title:   Finish pending goal
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
+        mainViewModel.activatePendingView();
+
+        //Tap and do nothing
+        //Tap and hold logic
+        //Select finish, move pending goal to today logic
+        //assertCompleteCount(1); //assert goal is completed
+        //assert the goal's pending is now false
+        mainViewModel.activateTomorrowView();
+        //assert the goal is on today view
+
+
+    }
+
+    @Test
+    public void MS2_US8Scenario4() {
+        //Title: Delete pending goal
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
+        mainViewModel.activatePendingView();
+
+        //Tap and do nothing
+        //Tap and hold logic
+        //Select delete logic
+        //assert there are no goals
+
+    }
+
+
 }

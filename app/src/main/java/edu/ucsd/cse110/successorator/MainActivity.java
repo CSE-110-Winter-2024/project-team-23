@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.PopupMenu;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,12 +61,21 @@ public class MainActivity extends AppCompatActivity {
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
 
+        //Registration for press and hold menu
+        registerForContextMenu(this.view.goalList);
+
+
         view.goalList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // Reference for clicking on List View:
             // https://anna-scott.medium.com/clickable-listview-items-with-clickable-buttons-e52fa6030d36
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                mainViewModel.pressGoal(Math.toIntExact(id));
+                //Pending logic so that click does nothing
+                if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING ) {
+
+                } else {
+                    mainViewModel.pressGoal(Math.toIntExact(id));
+                }
             }
         });
 
@@ -134,4 +145,22 @@ public class MainActivity extends AppCompatActivity {
         }
         return clicked;
     }
+
+    // Using this and Android documentation as reference for context menu behavior
+    // https://stackoverflow.com/questions/9114912/what-is-context-menu-method-registerforcontextmenu
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.add(Menu.NONE, 1, Menu.NONE, "Today");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Tomorrow");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Finish");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Delete");
+    }
+
+    //This should handle the logic, examples online uses switch cases
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return false;
+    }
+
+
 }
