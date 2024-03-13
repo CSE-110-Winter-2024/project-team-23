@@ -234,7 +234,6 @@ public class MainViewModel extends ViewModel {
                         this.goalRepository.remove(goal.id());
                         return false;
                     }
-                    ;
                 }
                 return true;
             }).collect(Collectors.toList());

@@ -11,13 +11,7 @@ public class PendingGoalSorter implements IGoalSorter {
         } else if (a.context().ordinal() < b.context().ordinal()) {
             return -1;
         } else {
-            if (a.sortOrder() > b.sortOrder()) {
-                return 1;
-            } else if (a.sortOrder() < b.sortOrder()) {
-                return -1;
-            } else {
-                return 0;
-            }
+            return Integer.compare(a.sortOrder(), b.sortOrder());
         }
     }
 }
