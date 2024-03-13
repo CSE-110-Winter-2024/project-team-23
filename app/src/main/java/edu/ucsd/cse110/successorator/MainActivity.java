@@ -1,8 +1,9 @@
 package edu.ucsd.cse110.successorator;
 
 
-
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
+import edu.ucsd.cse110.successorator.ui.CreateRecurringGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,12 +60,21 @@ public class MainActivity extends AppCompatActivity {
         //Create list display.
         this.view.goalList.setAdapter(listAdapter);
 
+        //Registration for press and hold menu
+        registerForContextMenu(this.view.goalList);
+
+
         view.goalList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             // Reference for clicking on List View:
             // https://anna-scott.medium.com/clickable-listview-items-with-clickable-buttons-e52fa6030d36
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                mainViewModel.pressGoal(Math.toIntExact(id));
+                //Pending logic so that click does nothing
+                if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+
+                } else {
+                    mainViewModel.pressGoal(Math.toIntExact(id));
+                }
             }
         });
 
@@ -92,10 +103,14 @@ public class MainActivity extends AppCompatActivity {
         //Home screen menu items
         if (itemId == R.id.add_goal_menu) {
             //probably refactor into its own method later
-            var dialogFragment = CreateGoalDialogFragment.newInstance();
-            dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
-        }
-        else if (itemId == R.id.change_view_menu) {
+            if (mainViewModel.getCurrentMode().getValue() == AppMode.RECURRING) {
+                var dialogFragment = CreateRecurringGoalDialogFragment.newInstance();
+                dialogFragment.show(getSupportFragmentManager(), "CreateRecurringGoalDialogFragment");
+            } else {
+                var dialogFragment = CreateGoalDialogFragment.newInstance();
+                dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
+            }
+        } else if (itemId == R.id.change_view_menu) {
             View anchor = this.findViewById(R.id.change_view_menu);
             PopupMenu viewMenu = new PopupMenu(this, anchor);
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
@@ -112,20 +127,38 @@ public class MainActivity extends AppCompatActivity {
         return listAdapter;
     }
 
-    public boolean onMenuItemClick(MenuItem item){
+    public boolean onMenuItemClick(MenuItem item) {
         var itemId = item.getItemId();
         boolean clicked = true;
         if (itemId == R.id.today_popup) {
             this.mainViewModel.activateTodayView();
-        } else if (itemId == R.id.tomorrow_popup){
+        } else if (itemId == R.id.tomorrow_popup) {
             this.mainViewModel.activateTomorrowView();
-        } else if (itemId == R.id.pending_popup){
+        } else if (itemId == R.id.pending_popup) {
             this.mainViewModel.activatePendingView();
-        } else if (itemId == R.id.recurring_popup){
+        } else if (itemId == R.id.recurring_popup) {
             this.mainViewModel.activateRecurringView();
         } else {
             clicked = false;
         }
         return clicked;
     }
+
+    // Using this and Android documentation as reference for context menu behavior
+    // https://stackoverflow.com/questions/9114912/what-is-context-menu-method-registerforcontextmenu
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.add(Menu.NONE, 1, Menu.NONE, "Today");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Tomorrow");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Finish");
+        menu.add(Menu.NONE, 1, Menu.NONE, "Delete");
+    }
+
+    //This should handle the logic, examples online uses switch cases
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return false;
+    }
+
+
 }

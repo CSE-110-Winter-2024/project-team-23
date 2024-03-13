@@ -2,7 +2,6 @@ package edu.ucsd.cse110.successorator;
 
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
-
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
@@ -12,7 +11,6 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -235,7 +233,8 @@ public class MainViewModel extends ViewModel {
                     if (recurrenceIds.get(goal.recurrenceId()).id() != goal.id()) {
                         this.goalRepository.remove(goal.id());
                         return false;
-                    };
+                    }
+                    ;
                 }
                 return true;
             }).collect(Collectors.toList());
@@ -269,7 +268,7 @@ public class MainViewModel extends ViewModel {
         if (appMode == null) {
             return false;
         }
-        if (appMode.equals(PENDING) || appMode.equals(AppMode.RECURRING)) {
+        if (appMode.equals(PENDING)) {
             return false;
         }
         if (appMode.equals(TOMORROW) && goal.recurringGenerated()) {
@@ -281,8 +280,7 @@ public class MainViewModel extends ViewModel {
                     return false;
                 }
             }
-        }
-        else if (appMode.equals(TODAY) && goal.recurringGenerated()) {
+        } else if (appMode.equals(TODAY) && goal.recurringGenerated()) {
             // If next goal exists and is complete, we should fail
             // This case isn't specified explicitly in clarifications, but it follows from the
             // statement that there can only be one "active" recurring instance at a time
@@ -293,7 +291,11 @@ public class MainViewModel extends ViewModel {
                     return false;
                 }
             }
+        } else if (appMode.equals(AppMode.RECURRING)) {
+            this.deleteRecurringGoal(goalId);
+            return true;
         }
+
         if (goal.completed()) {
             var newGoal = goal.markIncomplete();
             goalRepository.update(newGoal);
@@ -361,6 +363,10 @@ public class MainViewModel extends ViewModel {
         return currentDateString;
     }
 
+    public Subject<AppMode> getCurrentMode() {
+        return currentMode;
+    }
+
     // All testing for this method is accomplished via title strings and above functions
     private void updateCalendarStrings(AppMode appMode, Calendar localized) {
         var displayDate = (Calendar) localized.clone();
@@ -411,7 +417,14 @@ public class MainViewModel extends ViewModel {
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
-        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime, null, null, null, false);
+        var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
+        goalRepository.append(newGoal);
+    }
+
+    public void addPendingGoal(String contents, Context context) {
+        var currentTime = this.currentDate.getValue();
+        if (currentTime == null) return;
+        var newGoal = new Goal(null, contents, 0, false, currentTime, true, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
         goalRepository.append(newGoal);
     }
 
@@ -422,6 +435,10 @@ public class MainViewModel extends ViewModel {
         var selectedDate = (Calendar) currentTime.clone();
         // Set at 12:00 PM to avoid 2am edge cases
         selectedDate.set(year, month, day, 12, 0, 0);
+        //  Is this a bug? It seems like we are checking if selected date is equal to itself
+        //  if (selectedDate.get(Calendar.DAY_OF_MONTH) == day && selectedDate.get(Calendar.YEAR) == year && selectedDate.get(Calendar.MONTH) == month) {
+        //      return false;
+        //  }
         currentTime = TimeUtils.twoAMNormalized(currentTime);
         if (selectedDate.before(currentTime)) return false;
         var selectedMoment = selectedDate.getTimeInMillis();
@@ -456,7 +473,8 @@ public class MainViewModel extends ViewModel {
     // Public for testing
     // Only call from a context where it won't recurse into LiveData updates
     public void handleRecurringGoalGeneration(Goal recurringGoal, Calendar currentDate) {
-        if (!recurringGoal.recurring() || recurringGoal.recurrenceType().equals(RecurrenceType.NONE)) return;
+        if (!recurringGoal.recurring() || recurringGoal.recurrenceType().equals(RecurrenceType.NONE))
+            return;
         // nextId is null, so we need to generate the first goal
         if (recurringGoal.nextId() == null) {
             // Created at start date
@@ -542,6 +560,10 @@ public class MainViewModel extends ViewModel {
             }
         }
 
-
     }
 }
+
+//    public AppMode getCurrentMode() {
+//        return currentMode.getValue();
+//    }
+//}

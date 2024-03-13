@@ -73,7 +73,7 @@ public class GoalEntity {
 
     public static GoalEntity fromGoal(Goal goal) {
         GoalEntity goalEntity = new GoalEntity(goal.content(), goal.sortOrder(),
-                goal.completed(), goal.completionDate(), goal.startDate(), goal.pending(), goal.recurring() , RecurrenceType.NONE, Context.HOME, goal.prevId(), goal.nextId(), goal.recurrenceId(), goal.recurringGenerated());
+                goal.completed(), goal.completionDate(), goal.startDate(), goal.pending(), goal.recurring() , goal.recurrenceType(), goal.context(), goal.prevId(), goal.nextId(), goal.recurrenceId(), goal.recurringGenerated());
         goalEntity.id = goal.id();
         return goalEntity;
     }
