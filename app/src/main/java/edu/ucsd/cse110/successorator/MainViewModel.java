@@ -268,7 +268,7 @@ public class MainViewModel extends ViewModel {
         if (appMode == null) {
             return false;
         }
-        if (appMode.equals(PENDING) || appMode.equals(AppMode.RECURRING)) {
+        if (appMode.equals(PENDING)) {
             return false;
         }
         if (appMode.equals(TOMORROW) && goal.recurringGenerated()) {
@@ -291,7 +291,11 @@ public class MainViewModel extends ViewModel {
                     return false;
                 }
             }
+        } else if (appMode.equals(AppMode.RECURRING)) {
+            this.deleteRecurringGoal(goalId);
+            return true;
         }
+
         if (goal.completed()) {
             var newGoal = goal.markIncomplete();
             goalRepository.update(newGoal);
