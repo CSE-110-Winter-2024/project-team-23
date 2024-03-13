@@ -363,7 +363,9 @@ public class MainViewModel extends ViewModel {
         return currentDateString;
     }
 
-    public Subject<AppMode> getCurrentMode() { return currentMode;}
+    public Subject<AppMode> getCurrentMode() {
+        return currentMode;
+    }
 
     // All testing for this method is accomplished via title strings and above functions
     private void updateCalendarStrings(AppMode appMode, Calendar localized) {
@@ -558,10 +560,10 @@ public class MainViewModel extends ViewModel {
             }
         }
 
-
-    }
-
-    public AppMode getCurrentMode() {
-        return currentMode.getValue();
     }
 }
+
+//    public AppMode getCurrentMode() {
+//        return currentMode.getValue();
+//    }
+//}
