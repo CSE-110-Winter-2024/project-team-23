@@ -11,7 +11,11 @@ public class DefaultGoalSorter implements IGoalSorter {
             return 1;
         } else if (!a.completed() && b.completed()) {
             return -1;
-        } else if (a.completed() && b.completed()) {
+        } else if (a.context().ordinal() > b.context().ordinal()) {
+            return 1;
+        } else if (a.context().ordinal() < b.context().ordinal()) {
+            return -1;
+        } else {
             if (a.sortOrder() > b.sortOrder()) {
                 return 1;
             } else if (a.sortOrder() < b.sortOrder()) {
@@ -19,21 +23,6 @@ public class DefaultGoalSorter implements IGoalSorter {
             } else {
                 return 0;
             }
-        } else {
-            if (a.context().ordinal() > b.context().ordinal()) {
-                return 1;
-            } else if (a.context().ordinal() < b.context().ordinal()) {
-                return -1;
-            } else {
-                if (a.sortOrder() > b.sortOrder()) {
-                    return 1;
-                } else if (a.sortOrder() < b.sortOrder()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
         }
-
     }
 }
