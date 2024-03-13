@@ -20,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
+        android:id="@+id/contextRadio"
         android:layout_width="360dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"

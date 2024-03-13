@@ -23,6 +23,10 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
     private RecurrenceType recurrenceType;
+
+    private Context context;
+
+
     public CreateRecurringGoalDialogFragment() {
         // Required empty public constructor
     }
@@ -49,6 +53,8 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateRecurringGoalBinding.inflate(getLayoutInflater());
 
+
+
         // Create listener for context buttons
         this.view.recurrenceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == this.view.dailyRecurringGoalButton.getId()) {
@@ -59,6 +65,19 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
                 this.recurrenceType = RecurrenceType.MONTHLY;
             } else if (checkedId == this.view.yearlyRecurringGoalButton.getId()) {
                 this.recurrenceType = RecurrenceType.YEARLY;
+            }
+        });
+
+        // Create listener for context buttons
+        this.view.contextRadio.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == this.view.homeButton.getId()) {
+                this.context = Context.HOME;
+            } else if (checkedId == this.view.workButton.getId()) {
+                this.context = Context.WORK;
+            } else if (checkedId == this.view.schoolButton.getId()) {
+                this.context = Context.SCHOOL;
+            } else if (checkedId == this.view.errandsButton.getId()) {
+                this.context = Context.ERRANDS;
             }
         });
 
@@ -74,7 +93,8 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     String content = view.goalInput.getText().toString();
                     //Context is defaulted to HOME, Needs US3 to be implemented.
-                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), recurrenceType, Context.HOME);
+                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]),
+                            recurrenceType, context);
 
                     //Lambda functions allow for usage of this. in interface declaration.
                     //Interestingly, without it dismiss() appears to call the correct function regardless.
