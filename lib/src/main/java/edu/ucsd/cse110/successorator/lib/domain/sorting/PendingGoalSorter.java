@@ -6,6 +6,12 @@ import edu.ucsd.cse110.successorator.lib.domain.Goal;
 public class PendingGoalSorter implements IGoalSorter {
     @Override
     public int compare(Goal a, Goal b) {
-        return 0;
+        if (a.context().ordinal() > b.context().ordinal()) {
+            return 1;
+        } else if (a.context().ordinal() < b.context().ordinal()) {
+            return -1;
+        } else {
+            return Integer.compare(a.sortOrder(), b.sortOrder());
+        }
     }
 }

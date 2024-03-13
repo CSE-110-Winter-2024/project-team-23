@@ -156,7 +156,7 @@ public class MainViewModel extends ViewModel {
 
         this.currentContext.observe(context -> {
             if (context == null) return;
-            var goals = this.orderedGoals.getValue();
+            var goals = this.goalRepository.findAll().getValue();
             if (goals == null) return;
             // Filter the goals on context
             var goalsToDisplay = goals.stream().filter(goal -> GoalUtils.shouldShowContext(goal, context)).collect(Collectors.toList());
@@ -234,7 +234,6 @@ public class MainViewModel extends ViewModel {
                         this.goalRepository.remove(goal.id());
                         return false;
                     }
-                    ;
                 }
                 return true;
             }).collect(Collectors.toList());
