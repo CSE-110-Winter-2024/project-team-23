@@ -5,7 +5,6 @@ import java.util.Calendar;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.util.TimeUtils;
 
-// TODO: actually implement this and unit test it when you write task 4.1/6.5
 public class TomorrowGoalFilter implements IGoalFilter {
     @Override
     public boolean shouldShow(Goal goal, Calendar now) {

@@ -7,6 +7,8 @@ import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
 
+import android.content.pm.CapabilityParams;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
@@ -411,6 +413,11 @@ public class MainViewModel extends ViewModel {
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
+        var appMode = this.currentMode.getValue();
+        if (appMode == null) return;
+        if (appMode.equals(TOMORROW)) {
+            currentTime += 24 * 60 * 60 * 1000;
+        }
         var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, Context.HOME, currentTime, null, null, null, false);
         goalRepository.append(newGoal);
     }
