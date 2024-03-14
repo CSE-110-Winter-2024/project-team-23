@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,7 +92,6 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
             if (parts.length == 3) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String content = view.goalInput.getText().toString();
-                    //Context is defaulted to HOME, Needs US3 to be implemented.
                     boolean success = mainViewModel.addRecurringGoal(content, Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]), recurrenceType, context);
                     if (!success) {
                         // Display a popup telling the user to correct their date or select a context
