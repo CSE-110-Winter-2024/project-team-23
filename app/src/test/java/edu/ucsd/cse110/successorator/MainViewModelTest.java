@@ -715,6 +715,96 @@ public class MainViewModelTest {
     }
 
     @Test
+    public void MS2_US4Scenario1() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTomorrowView();
+
+        mainViewModel.addGoal("ASDF", Context.HOME);
+
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+
+        mainViewModel.activateRecurringView();
+
+        assertIncompleteCount(0);
+
+        mainViewModel.activatePendingView();
+
+        assertIncompleteCount(0);
+    }
+
+    @Test
+    public void MS2_US4Scenario2() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTomorrowView();
+
+        mainViewModel.addGoal("ASDF", Context.HOME);
+        mainViewModel.pressGoal(1);
+
+        assertIncompleteCount(0);
+        assertCompleteCount(1);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        // Advance real time by 24 hours
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH);
+
+        mainViewModel.activateTomorrowView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(1);
+    }
+
+    @Test
+    public void MS2_US4Scenario3() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addRecurringGoalDateless("ASDF", RecurrenceType.WEEKLY, Context.HOME);
+
+        // Complete recurring goal instance today
+        // Generated goal has ID 2; we can hardcode here because of the way we generate goals
+        mainViewModel.pressGoal(2);
+
+        // Advance the real time by 5 days; next recurring goal instance should be 2 days after
+        // So not visible in today or tomorrow view
+
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 5);
+
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+
+        // Advance the real time by another day
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 6);
+
+        mainViewModel.activateTomorrowView();
+
+        assertCompleteCount(0);
+        assertIncompleteCount(1);
+    }
+
+
+    @Test
     public void MS2_US6Scenario1() {
         goalRepository = MockGoalRepository.createWithEmptyGoals();
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
