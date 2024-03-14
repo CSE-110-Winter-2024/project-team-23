@@ -163,38 +163,47 @@ public class MainViewModelTest {
     @Test
     public void testCalendarStreings() {
         // Verify that the current date string is correct
-        // Test the weekday and m/d strings as well, but the nth weekday gets its own test
+        // Test the weekday and m/d strings as well
         var currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Wed 2/7", currentDateString);
-        var currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        var currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Wed", currentWeekdayString);
-        var currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Wed", currentWeekdayString);
+        var currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 1st Wed", currentMonthDayString);
+        var currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/7", currentDateString2);
+        assertEquals("Yearly on 2/7", currentDateString2);
         // advance 9 hours and verify no change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Wed 2/7", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Wed", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Wed", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 1st Wed", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/7", currentDateString2);
+        assertEquals("Yearly on 2/7", currentDateString2);
         // Advance another 2 and verify change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Thu 2/8", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Thu", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Thu", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Thu", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/8", currentDateString2);
+        assertEquals("Yearly on 2/8", currentDateString2);
         // Now test different app modes
         mainViewModel.activatePendingView();
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
@@ -204,12 +213,15 @@ public class MainViewModelTest {
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Tomorrow, Fri 2/9", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Fri", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Fri", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Fri", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/9", currentDateString2);
+        assertEquals("Yearly on 2/9", currentDateString2);
         mainViewModel.activateRecurringView();
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
@@ -218,13 +230,29 @@ public class MainViewModelTest {
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Thu 2/8", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Thu", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Thu", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Thu", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/8", currentDateString2);
-
+        assertEquals("Yearly on 2/8", currentDateString2);
+        // Special case for 3rd, 4th, 5th
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 8);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 3rd Thu", currentMonthDayString);
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 15);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 4th Thu", currentMonthDayString);
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 22);
+        // Take advantage of leap year to make this test easy
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 5th Thu", currentMonthDayString);
     }
 
     @Test
@@ -366,7 +394,7 @@ public class MainViewModelTest {
         mainViewModel.addGoal("Install game update", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
         assertCompleteCount(0);
-        assertIncompleteCount(1);
+        assertIncompleteCount(2);
 
         //Steps 15 to 24
         mainViewModel.activatePendingView();
@@ -641,7 +669,46 @@ public class MainViewModelTest {
         goal = goals.get(1).getValue();
         assertNotNull(goal);
         assertEquals((Integer) 3, goal.id());
+    }
 
+    @Test
+    public void deleteRecurringGoalGeneratedGoals() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        // Tests the specific cases where: first goal of recurring goal is visible tomorrow
+        // so make sure that first goal still exists
+        // first goal of recurring goal is NOT visible today or tomorrow, so it should go away
+        // recurring goal has an instance visible today, and one not visible tomorrow
+        // Start date is feb 7 2024, so spawn a daily recurring on feb 8 2024
+        mainViewModel.addRecurringGoal("Recurring Goal", 2024, 1, 8, RecurrenceType.DAILY, Context.HOME);
+        var goals = goalRepository.goals;
+        assertEquals(2, goals.size());
+
+        // Delete the goal
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(1, goals.size());
+
+        // Reset, then do daily recurring goal on feb 9
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Recurring Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+        goals = goalRepository.goals;
+        assertEquals(2, goals.size());
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(0, goals.size());
+
+        // Reset, then do weekly recurring goal today
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoalDateless("Recurring Goal", RecurrenceType.WEEKLY, Context.HOME);
+        goals = goalRepository.goals;
+        assertEquals(3, goals.size()); // next instance should be generated in this case
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(1, goals.size());
     }
 
     @Test
@@ -713,6 +780,96 @@ public class MainViewModelTest {
         assertEquals(output.get(2).context(), Context.SCHOOL);
         assertEquals(output.get(3).context(), Context.ERRANDS);
     }
+
+    @Test
+    public void MS2_US4Scenario1() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTomorrowView();
+
+        mainViewModel.addGoal("ASDF", Context.HOME);
+
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+
+        mainViewModel.activateRecurringView();
+
+        assertIncompleteCount(0);
+
+        mainViewModel.activatePendingView();
+
+        assertIncompleteCount(0);
+    }
+
+    @Test
+    public void MS2_US4Scenario2() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTomorrowView();
+
+        mainViewModel.addGoal("ASDF", Context.HOME);
+        mainViewModel.pressGoal(1);
+
+        assertIncompleteCount(0);
+        assertCompleteCount(1);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        // Advance real time by 24 hours
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH);
+
+        mainViewModel.activateTomorrowView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTodayView();
+
+        assertIncompleteCount(0);
+        assertCompleteCount(1);
+    }
+
+    @Test
+    public void MS2_US4Scenario3() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.addRecurringGoalDateless("ASDF", RecurrenceType.WEEKLY, Context.HOME);
+
+        // Complete recurring goal instance today
+        // Generated goal has ID 2; we can hardcode here because of the way we generate goals
+        mainViewModel.pressGoal(2);
+
+        // Advance the real time by 5 days; next recurring goal instance should be 2 days after
+        // So not visible in today or tomorrow view
+
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 5);
+
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+
+        assertCompleteCount(0);
+        assertIncompleteCount(0);
+
+        // Advance the real time by another day
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 6);
+
+        mainViewModel.activateTomorrowView();
+
+        assertCompleteCount(0);
+        assertIncompleteCount(1);
+    }
+
 
     @Test
     public void MS2_US6Scenario1() {
