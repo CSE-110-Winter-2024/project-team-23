@@ -93,7 +93,7 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     String content = view.goalInput.getText().toString();
                     //Context is defaulted to HOME, Needs US3 to be implemented.
-                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]),
+                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]),
                             recurrenceType, context);
 
                     //Lambda functions allow for usage of this. in interface declaration.
