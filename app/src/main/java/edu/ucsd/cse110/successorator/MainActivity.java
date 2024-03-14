@@ -116,6 +116,15 @@ public class MainActivity extends AppCompatActivity {
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
             viewMenu.setOnMenuItemClickListener(i -> onMenuItemClick(i));
             viewMenu.show();
+        } else if (itemId == R.id.context_goal_menu) {
+            // This is the exact same logic as the top right menu,
+            // the problem is that the this is also on the top right, so I need
+            // to figure out how to shift to the left
+            View anchor = this.findViewById(R.id.context_goal_menu);
+            PopupMenu viewMenu = new PopupMenu(this, anchor);
+            viewMenu.getMenuInflater().inflate(R.menu.context_view_popup, viewMenu.getMenu());
+            viewMenu.setOnMenuItemClickListener(i -> onMenuItemClick(i));
+            viewMenu.show();
         } else if (itemId == android.R.id.home) {
             this.mainViewModel.advance24Hours();
         }
