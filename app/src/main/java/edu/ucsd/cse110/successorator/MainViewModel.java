@@ -5,6 +5,7 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+import static edu.ucsd.cse110.successorator.lib.util.TimeUtils.nthDayofWeek;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
@@ -433,7 +434,8 @@ public class MainViewModel extends ViewModel {
         if (currentTime == null) return false;
         var selectedDate = (Calendar) currentTime.clone();
         // Set at 12:00 PM to avoid 2am edge cases
-        selectedDate.set(year, month, day, 12, 0, 0);
+        // Decremented month by 1 because it is zero indexed
+        selectedDate.set(year, month - 1, day, 12, 0, 0);
         //  Is this a bug? It seems like we are checking if selected date is equal to itself
         //  if (selectedDate.get(Calendar.DAY_OF_MONTH) == day && selectedDate.get(Calendar.YEAR) == year && selectedDate.get(Calendar.MONTH) == month) {
         //      return false;
@@ -467,6 +469,28 @@ public class MainViewModel extends ViewModel {
         recurringGoal = goalRepository.findGoal(goalId);
 
         handleRecurringGoalGeneration(recurringGoal, currentTime);
+    }
+
+    // Method that adds date text when a recurring goal will reoccur
+    public String getGoalContent(Goal goal) {
+        if (currentMode.getValue() == AppMode.RECURRING) {
+            var startDate = TimeUtils.localize(goal.startDate(), dateConverter);
+
+            switch (goal.recurrenceType()) {
+                case DAILY:
+                    return goal.content() + ", Daily";
+                case WEEKLY:
+                    return goal.content() + ", Weekly on " + startDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                case MONTHLY:
+                    return goal.content() + ", Monthly on " + nthDayofWeek(startDate);
+                case YEARLY:
+                    return goal.content() + ", Yearly on " + (startDate.get(Calendar.MONTH) + 1) + "/" + startDate.get(Calendar.DAY_OF_MONTH);
+                default:
+                    return goal.content();
+            }
+        } else {
+            return goal.content();
+        }
     }
 
     // Public for testing
