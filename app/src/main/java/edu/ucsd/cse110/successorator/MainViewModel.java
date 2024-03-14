@@ -436,8 +436,7 @@ public class MainViewModel extends ViewModel {
         if (currentTime == null) return false;
         var selectedDate = (Calendar) currentTime.clone();
         // Set at 12:00 PM to avoid 2am edge cases
-        // Decremented month by 1 because it is zero indexed
-        selectedDate.set(year, month - 1, day, 12, 0, 0);
+        selectedDate.set(year, month, day, 12, 0, 0);
         //  Is this a bug? It seems like we are checking if selected date is equal to itself
         if (selectedDate.get(Calendar.DAY_OF_MONTH) != day || selectedDate.get(Calendar.YEAR) != year && selectedDate.get(Calendar.MONTH) != month) {
             return false;
