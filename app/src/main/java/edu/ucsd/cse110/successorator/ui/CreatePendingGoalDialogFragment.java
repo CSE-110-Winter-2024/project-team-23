@@ -12,23 +12,23 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
-import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
+import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreatePendingGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
 
 
-public class CreateGoalDialogFragment extends DialogFragment {
-    private FragmentDialogCreateGoalBinding view;
+public class CreatePendingGoalDialogFragment extends DialogFragment {
+    private FragmentDialogCreatePendingGoalBinding view;
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
 
     private Context context;
 
-    public CreateGoalDialogFragment() {
+    public CreatePendingGoalDialogFragment() {
         // Required empty public constructor
     }
 
-    public static CreateGoalDialogFragment newInstance() {
-        var fragment = new CreateGoalDialogFragment();
+    public static CreatePendingGoalDialogFragment newInstance() {
+        var fragment = new CreatePendingGoalDialogFragment();
         //In case args needed in future.
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -48,7 +48,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
+        this.view = FragmentDialogCreatePendingGoalBinding.inflate(getLayoutInflater());
 
 
         // Create listener for context buttons
@@ -77,7 +77,9 @@ public class CreateGoalDialogFragment extends DialogFragment {
                     return false;
                 }
 
-                mainViewModel.addGoal(content, context);
+                //Add pending goal to the view model.
+                mainViewModel.addPendingGoal(content, context);
+
                 //Lambda functions allow for usage of this. in interface declaration.
                 //Interestingly, without it dismiss() appears to call the correct function regardless.
                 this.dismiss();
