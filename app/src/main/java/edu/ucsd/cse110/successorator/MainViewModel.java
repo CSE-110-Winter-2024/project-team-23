@@ -429,6 +429,8 @@ public class MainViewModel extends ViewModel {
 
     // Returns true if the goal was added, or false if it wasn't (due to the selected date being in the past)
     public boolean addRecurringGoal(String contents, int year, int month, int day, RecurrenceType recurrenceType, Context context) {
+        if (context == null) return false;
+        if (recurrenceType == null) return false;
         var currentTime = this.currentDateLocalized.getValue();
         if (currentTime == null) return false;
         var selectedDate = (Calendar) currentTime.clone();
