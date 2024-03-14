@@ -9,9 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
@@ -53,6 +51,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
+
+        // Hook up button labels to the view model
+        mainViewModel.getWeeklyButtonString().observe(text -> view.WeeklyRecurringGoalButton.setText(text));
+        mainViewModel.getMonthlyButtonString().observe(text -> view.MonthlyRecurringGoalButton.setText(text));
+        mainViewModel.getYearlyButtonString().observe(text -> view.YearlyRecurringGoalButton.setText(text));
 
 
         // Create listener for context buttons

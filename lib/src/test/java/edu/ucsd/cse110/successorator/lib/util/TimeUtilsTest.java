@@ -293,4 +293,44 @@ public class TimeUtilsTest {
         assertEquals(normalized.get(Calendar.DAY_OF_YEAR), test.get(Calendar.DAY_OF_YEAR));
 
     }
+
+    @Test
+    public void shouldShowIncompleteGoalTomorrow() {
+
+        // Test 1: Goal Created After 2AM Today and Current Time is After 2AM
+        var now = Calendar.getInstance();
+        now.set(Calendar.HOUR_OF_DAY, 4);
+        var today = (Calendar) now.clone();
+        var tomorrow = (Calendar) now.clone();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        var yesterday = (Calendar) now.clone();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(yesterday, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoalTomorrow(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(tomorrow, now));
+
+        // Test 2: Goal Created Before 2AM Today and Current Time is After 2AM
+        yesterday.set(Calendar.HOUR_OF_DAY, 1);
+        today.set(Calendar.HOUR_OF_DAY, 1);
+        tomorrow.set(Calendar.HOUR_OF_DAY, 1);
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(yesterday, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(today, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoalTomorrow(tomorrow, now));
+
+        // Adjust now to represent a time before 2AM - For tests 3, 4
+        now.set(Calendar.HOUR_OF_DAY, 1);
+
+        // Test 3: Goal Created before 2AM and Current Time is Before 2AM
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(yesterday, now));
+        assertTrue(TimeUtils.shouldShowIncompleteGoalTomorrow(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(tomorrow, now));
+
+        // Test 4: Goal Created after 2AM and Current Time is Before 2AM
+        yesterday.set(Calendar.HOUR_OF_DAY, 3);
+        today.set(Calendar.HOUR_OF_DAY, 3);
+        tomorrow.set(Calendar.HOUR_OF_DAY, 3);
+        assertTrue(TimeUtils.shouldShowIncompleteGoalTomorrow(yesterday, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(today, now));
+        assertFalse(TimeUtils.shouldShowIncompleteGoalTomorrow(tomorrow, now));
+    }
 }
