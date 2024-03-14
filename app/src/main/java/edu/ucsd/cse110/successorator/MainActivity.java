@@ -4,6 +4,7 @@ package edu.ucsd.cse110.successorator;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,10 +115,18 @@ public class MainActivity extends AppCompatActivity {
             View anchor = this.findViewById(R.id.change_view_menu);
             PopupMenu viewMenu = new PopupMenu(this, anchor);
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
-            viewMenu.setOnMenuItemClickListener(i -> onMenuItemClick(i));
+            viewMenu.setOnMenuItemClickListener(this::onViewMenuItemClick);
             viewMenu.show();
         } else if (itemId == android.R.id.home) {
-            this.mainViewModel.advance24Hours();
+            //View anchor = this.findViewById(android.R.id.home);
+            View anchor = this.findViewById(R.id.change_view_menu);
+            PopupMenu focusMenu = new PopupMenu(this, anchor);
+            focusMenu.setGravity(Gravity.BOTTOM);
+            focusMenu.getMenuInflater().inflate(R.menu.focus_popup, focusMenu.getMenu());
+            focusMenu.setOnMenuItemClickListener(this::onFocusMenuItemClick);
+            focusMenu.show();
+            //TODO: Reimplement this somewhere else.
+            //this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -127,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         return listAdapter;
     }
 
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onViewMenuItemClick(MenuItem item) {
         var itemId = item.getItemId();
         boolean clicked = true;
         if (itemId == R.id.today_popup) {
@@ -138,6 +147,25 @@ public class MainActivity extends AppCompatActivity {
             this.mainViewModel.activatePendingView();
         } else if (itemId == R.id.recurring_popup) {
             this.mainViewModel.activateRecurringView();
+        } else {
+            clicked = false;
+        }
+        return clicked;
+    }
+
+    public boolean onFocusMenuItemClick(MenuItem item) {
+        var itemId = item.getItemId();
+        boolean clicked = true;
+        if (itemId == R.id.home_popup) {
+            this.mainViewModel.setFocusHome();
+        } else if (itemId == R.id.work_popup) {
+            this.mainViewModel.setFocusWork();
+        } else if (itemId == R.id.school_popup) {
+            this.mainViewModel.setFocusSchool();
+        } else if (itemId == R.id.errands_popup) {
+            this.mainViewModel.setFocusErrands();
+        } else if (itemId == R.id.cancel_popup) {
+            this.mainViewModel.deactivateFocusMode();
         } else {
             clicked = false;
         }
