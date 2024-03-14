@@ -641,7 +641,46 @@ public class MainViewModelTest {
         goal = goals.get(1).getValue();
         assertNotNull(goal);
         assertEquals((Integer) 3, goal.id());
+    }
 
+    @Test
+    public void deleteRecurringGoalGeneratedGoals() {
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        // Tests the specific cases where: first goal of recurring goal is visible tomorrow
+        // so make sure that first goal still exists
+        // first goal of recurring goal is NOT visible today or tomorrow, so it should go away
+        // recurring goal has an instance visible today, and one not visible tomorrow
+        // Start date is feb 7 2024, so spawn a daily recurring on feb 8 2024
+        mainViewModel.addRecurringGoal("Recurring Goal", 2024, 1, 8, RecurrenceType.DAILY, Context.HOME);
+        var goals = goalRepository.goals;
+        assertEquals(2, goals.size());
+
+        // Delete the goal
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(1, goals.size());
+
+        // Reset, then do daily recurring goal on feb 9
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoal("Recurring Goal", 2024, 1, 9, RecurrenceType.DAILY, Context.HOME);
+        goals = goalRepository.goals;
+        assertEquals(2, goals.size());
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(0, goals.size());
+
+        // Reset, then do weekly recurring goal today
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+        mainViewModel.addRecurringGoalDateless("Recurring Goal", RecurrenceType.WEEKLY, Context.HOME);
+        goals = goalRepository.goals;
+        assertEquals(3, goals.size()); // next instance should be generated in this case
+        mainViewModel.deleteRecurringGoal(1);
+        goals = goalRepository.goals;
+        assertEquals(1, goals.size());
     }
 
     @Test

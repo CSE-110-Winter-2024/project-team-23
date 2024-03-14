@@ -435,15 +435,15 @@ public class MainViewModel extends ViewModel {
         // Set at 12:00 PM to avoid 2am edge cases
         selectedDate.set(year, month, day, 12, 0, 0);
         //  Is this a bug? It seems like we are checking if selected date is equal to itself
-        //  if (selectedDate.get(Calendar.DAY_OF_MONTH) == day && selectedDate.get(Calendar.YEAR) == year && selectedDate.get(Calendar.MONTH) == month) {
-        //      return false;
-        //  }
+        if (selectedDate.get(Calendar.DAY_OF_MONTH) != day || selectedDate.get(Calendar.YEAR) != year && selectedDate.get(Calendar.MONTH) != month) {
+            return false;
+        }
         currentTime = TimeUtils.twoAMNormalized(currentTime);
         if (selectedDate.before(currentTime)) return false;
         var selectedMoment = selectedDate.getTimeInMillis();
-        var recurringGoal = new Goal(null, contents, 0, false, selectedMoment, false, true, recurrenceType, context, selectedDate.getTimeInMillis(), null, null, null, false);
+        var recurringGoal = new Goal(null, contents, 0, false, selectedMoment, false, true, recurrenceType, context, selectedMoment, null, null, null, false);
         var goalId = goalRepository.append(recurringGoal);
-        recurringGoal = goalRepository.findGoal(goalId);
+        recurringGoal = goalRepository.findGoal(goalId); // Populate object with db id
         handleRecurringGoalGeneration(recurringGoal, currentTime);
         return true;
     }
