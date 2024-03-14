@@ -1,12 +1,16 @@
 package edu.ucsd.cse110.successorator.lib.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static edu.ucsd.cse110.successorator.lib.util.TimeUtils.nthDayofWeek;
 
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.Locale;
 
-import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 public class TimeUtilsTest {
@@ -185,7 +189,6 @@ public class TimeUtilsTest {
         assertEquals(recurrence.get(Calendar.DAY_OF_MONTH), 31);
 
 
-
         calendar = Calendar.getInstance();
         calendar.set(year, month, day, hour, 0, 0);
         calendar.setTimeZone(TimeUtils.GMT);
@@ -267,7 +270,6 @@ public class TimeUtilsTest {
         assertEquals(TimeUtils.nextGoalRecurrenceIndex(now, start, RecurrenceType.MONTHLY), 6);
 
 
-
         // Test 4: Recurrence is Yearly
     }
 
@@ -292,5 +294,35 @@ public class TimeUtilsTest {
         assertEquals(normalized.get(Calendar.MILLISECOND), 0);
         assertEquals(normalized.get(Calendar.DAY_OF_YEAR), test.get(Calendar.DAY_OF_YEAR));
 
+    }
+
+    // Test Generated with GPT4, Check for correctness
+    @Test
+    public void testNthDayOfWeekForVariousDates() {
+        Calendar calendar = Calendar.getInstance(Locale.US);
+
+        // Test for the first Monday of a month
+        calendar.set(2024, Calendar.MARCH, 4); // Assuming March 4, 2024 is the first Monday
+        assertEquals("1st Monday", nthDayofWeek(calendar));
+
+        // Test for the second Tuesday of a month
+        calendar.set(2024, Calendar.APRIL, 9); // Assuming April 9, 2024 is the second Tuesday
+        assertEquals("2nd Tuesday", nthDayofWeek(calendar));
+
+        // Test for the third Wednesday of a month
+        calendar.set(2024, Calendar.MAY, 15); // Assuming May 15, 2024 is the third Wednesday
+        assertEquals("3rd Wednesday", nthDayofWeek(calendar));
+
+        // Test for the fourth Thursday of a month
+        calendar.set(2024, Calendar.JUNE, 27); // Assuming June 27, 2024 is the fourth Thursday
+        assertEquals("4th Thursday", nthDayofWeek(calendar));
+
+        // Test for the fifth Friday of a month
+        calendar.set(2024, Calendar.AUGUST, 30); // Assuming August 30, 2024 is the fifth Friday
+        assertEquals("5th Friday", nthDayofWeek(calendar));
+
+        // Test for the last Saturday of a month (could be 4th or 5th)
+        calendar.set(2024, Calendar.FEBRUARY, 24); // Assuming February 24, 2024 is the last Saturday
+        assertEquals("4th Saturday", nthDayofWeek(calendar));
     }
 }
