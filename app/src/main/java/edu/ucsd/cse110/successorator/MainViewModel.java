@@ -313,12 +313,23 @@ public class MainViewModel extends ViewModel {
 
     // Open question whether this method should take a Context or a String
     // TODO: test these methods in the PRs where they actually start being used
-    public void activateFocusMode(Context context) {
+    private void activateFocusMode(Context context) {
         this.currentContext.setValue(context);
     }
-
+    public void setFocusHome(){
+        this.activateFocusMode(Context.HOME);
+    }
+    public void setFocusWork(){
+        this.activateFocusMode(Context.WORK);
+    }
+    public void setFocusSchool(){
+        this.activateFocusMode(Context.SCHOOL);
+    }
+    public void setFocusErrands(){
+        this.activateFocusMode(Context.ERRANDS);
+    }
     public void deactivateFocusMode() {
-        this.currentContext.setValue(Context.NONE);
+        this.activateFocusMode(Context.NONE);
     }
 
     public void activateTodayView() {
