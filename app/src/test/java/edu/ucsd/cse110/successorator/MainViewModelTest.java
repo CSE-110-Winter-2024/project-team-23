@@ -1030,7 +1030,108 @@ public class MainViewModelTest {
 
     }
 
+    @Test
+    public void MS2_ScenarioBasedSystemTest1() {
+        //start time is feb 7, 2024, march 7 is 29 from the start time
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 29);
 
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
+        // on today view, we create a new goal
+        mainViewModel.activateTodayView();
+        mainViewModel.addGoal("10 km run", Context.HOME); // ID = 1
+        assertIncompleteCount(1);
+
+        // on tomorrow view, create a new goal
+        // BUG: Adding a goal in the tomorrow view adds it to the today list of goals
+        mainViewModel.activateTomorrowView();
+        mainViewModel.addGoal(" ", Context.HOME); // ID = 2
+        assertIncompleteCount(1);
+
+        // on recurrence view, create a new, daily goal
+        // BUG: Adding a goal for today in the recurrence view does not add the same goal in the today task
+        // assuming its the same for the tomorrow view as well
+        mainViewModel.activateRecurringView();
+        mainViewModel.addRecurringGoal("push buttons on keyboard", 2024, 2, 6, RecurrenceType.DAILY, Context.HOME); // ID = 3
+        assertIncompleteCount(1);
+
+        // on pending view, create a new goal
+        mainViewModel.activatePendingView();
+        mainViewModel.addPendingGoal("@everyone", Context.HOME); // ID = 4
+        assertIncompleteCount(1);
+
+        //checking today view to make sure it now has two goals
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(2);
+
+        // now we start marking goals complete
+        mainViewModel.pressGoal(1);
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTomorrowView();
+        mainViewModel.pressGoal(2);
+        assertIncompleteCount(0);
+
+        // pressing the recurring goal should fail because of the
+        // same goal that is in the today view
+        assertFalse(mainViewModel.pressGoal(3));
+
+        mainViewModel.activateTodayView();
+        mainViewModel.pressGoal(3);
+        mainViewModel.activateTomorrowView();
+        mainViewModel.pressGoal(3);
+
+//        mainViewModel.activatePendingView();
+//        mainViewModel.pressGoal()
+        // long press the pending goal, press finish, go to today view and see if the goal is completed on the page
+
+        // close app
+
+        // check the status of the recurrence goal for today and tomorrow
+        mainViewModel.advance24Hours();
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1);
+
+        // check again, so that everything should be incomplete now
+        mainViewModel.advance24Hours();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        // Go to April 3
+        for(int i = 0; i < 25; i++) {
+            mainViewModel.advance24Hours();
+        }
+
+        // Now, the weekly occurring goal should also appear in the tomorrow view
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(2);
+    }
+
+    public void MS2_ScenarioBasedSystemTest3() {
+        dateTicker.setValue(TimeUtils.START_TIME);
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTomorrowView();
+        mainViewModel.addGoal("work", Context.WORK);
+        mainViewModel.addGoal("home", Context.HOME);
+        assertIncompleteCount(3);
+
+        mainViewModel.addRecurringGoal("Errand", 2024, 1, 6, RecurrenceType.DAILY, Context.ERRANDS);
+        mainViewModel.addRecurringGoal("School", 2024, 1, 6, RecurrenceType.YEARLY, Context.SCHOOL);
+        mainViewModel.addRecurringGoal("cat", 2024, 1, 7, RecurrenceType.WEEKLY, Context.HOME);
+
+        // activate hamburger menu and go to HOME context screen
+    }
 
 }
