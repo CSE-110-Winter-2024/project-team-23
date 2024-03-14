@@ -92,7 +92,7 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
             if (parts.length == 3) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String content = view.goalInput.getText().toString();
-                    boolean success = mainViewModel.addRecurringGoal(content, Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]), recurrenceType, context);
+                    boolean success = (boolean) mainViewModel.addRecurringGoal(content, Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]), recurrenceType, context);
                     if (!success) {
                         // Display a popup telling the user to correct their date or select a context
                         // https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android
