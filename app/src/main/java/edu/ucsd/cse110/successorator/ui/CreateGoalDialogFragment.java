@@ -68,6 +68,12 @@ public class CreateGoalDialogFragment extends DialogFragment {
             }
         });
 
+
+        // pending goals don't need to be assigned a time
+        if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+            this.view.radioGroup.setVisibility(View.GONE);
+        }
+
         //Create listener for enter key.
         //Interface containing method called anytime enter key is pressed.
         //https://youtu.be/DivBp_9ZeK0?si=8Laea7bnST0mfmtm
