@@ -9,30 +9,30 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
-import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
-import edu.ucsd.cse110.successorator.lib.domain.AppMode;
+import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateRecurringGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
+import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 
-public class CreateGoalDialogFragment extends DialogFragment {
-    private FragmentDialogCreateGoalBinding view;
+public class CreateRecurringGoalDialogFragment extends DialogFragment {
+    private FragmentDialogCreateRecurringGoalBinding view;
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
+    private RecurrenceType recurrenceType;
 
     private Context context;
 
-    public CreateGoalDialogFragment() {
+
+    public CreateRecurringGoalDialogFragment() {
         // Required empty public constructor
     }
 
-    public static CreateGoalDialogFragment newInstance() {
-        var fragment = new CreateGoalDialogFragment();
+    public static CreateRecurringGoalDialogFragment newInstance() {
+        var fragment = new CreateRecurringGoalDialogFragment();
         //In case args needed in future.
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -48,12 +48,25 @@ public class CreateGoalDialogFragment extends DialogFragment {
         this.mainViewModel = modelProvider.get(MainViewModel.class);
     }
 
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
-        this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
+        this.view = FragmentDialogCreateRecurringGoalBinding.inflate(getLayoutInflater());
 
+
+
+        // Create listener for context buttons
+        this.view.recurrenceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == this.view.dailyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.DAILY;
+            } else if (checkedId == this.view.weeklyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.WEEKLY;
+            } else if (checkedId == this.view.monthlyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.MONTHLY;
+            } else if (checkedId == this.view.yearlyRecurringGoalButton.getId()) {
+                this.recurrenceType = RecurrenceType.YEARLY;
+            }
+        });
 
         // Create listener for context buttons
         this.view.contextRadio.setOnCheckedChangeListener((group, checkedId) -> {
@@ -74,23 +87,19 @@ public class CreateGoalDialogFragment extends DialogFragment {
         TextView.OnEditorActionListener editListener = (v, actionId, event) -> {
             //actionId determined in corresponding xml file.
             //Unnecessary now but futureproofs for multiple textboxes with the same listener.
-            if(actionId == EditorInfo.IME_ACTION_DONE){
-                String content = view.goalInput.getText().toString();
 
-                if (context == null) {
-                    return false;
+            String[] parts = view.recurringDatePicker.getText().toString().split("/");
+            if (parts.length == 3) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    String content = view.goalInput.getText().toString();
+                    //Context is defaulted to HOME, Needs US3 to be implemented.
+                    mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]), Integer.parseInt(parts[1]),
+                            recurrenceType, context);
+
+                    //Lambda functions allow for usage of this. in interface declaration.
+                    //Interestingly, without it dismiss() appears to call the correct function regardless.
+                    this.dismiss();
                 }
-
-                //If on pending view logic to make pending goal
-                if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
-                    mainViewModel.addPendingGoal(content, context);
-                } else {
-                    mainViewModel.addGoal(content, context);
-                }
-
-                //Lambda functions allow for usage of this. in interface declaration.
-                //Interestingly, without it dismiss() appears to call the correct function regardless.
-                this.dismiss();
             }
             return false;
         };

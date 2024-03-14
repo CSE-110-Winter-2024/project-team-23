@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/goal_input"
+        android:id="@+id/goalInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -28,7 +28,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_input">
+        app:layout_constraintTop_toBottomOf="@+id/goalInput">
 
         <RadioButton
             android:id="@+id/homeButton"
@@ -71,15 +71,14 @@
             android:background="@drawable/errands_context_radio"
             android:button="@null"
             android:buttonTint="#DDECD2"
-            android:paddingLeft="27dp"
+            android:paddingLeft="25dp"
             android:text="@string/errands"
             android:textSize="30sp" />
     </RadioGroup>
 
 
-
     <RadioGroup
-        android:id="@+id/radioGroup"
+        android:id="@+id/recurrenceRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="96dp"
@@ -87,58 +86,74 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goal_input">
+        app:layout_constraintTop_toBottomOf="@+id/goalInput">
 
         <RadioButton
-            android:id="@+id/NotRecurringGoalButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:text="One Time"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/goal_input" />
-
-        <RadioButton
-            android:id="@+id/DailyRecurringGoalButton"
+            android:id="@+id/dailyRecurringGoalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:text="Daily"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/NotRecurringGoalButton" />
+            app:layout_constraintStart_toStartOf="parent"/>
+
 
         <RadioButton
-            android:id="@+id/WeeklyRecurringGoalButton"
+            android:id="@+id/weeklyRecurringGoalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:text="Weekly"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/DailyRecurringGoalButton" />
+            app:layout_constraintTop_toBottomOf="@+id/dailyRecurringGoalButton" />
 
         <RadioButton
-            android:id="@+id/MonthlyRecurringGoalButton"
+            android:id="@+id/monthlyRecurringGoalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:text="Monthly"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/WeeklyRecurringGoalButton" />
+            app:layout_constraintTop_toBottomOf="@+id/weeklyRecurringGoalButton" />
 
         <RadioButton
-            android:id="@+id/YearlyRecurringGoalButton"
+            android:id="@+id/yearlyRecurringGoalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:text="Yearly"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/MonthlyRecurringGoalButton" />
+            app:layout_constraintTop_toBottomOf="@+id/monthlyRecurringGoalButton" />
+
+        <TextView
+            android:id="@+id/startingDateTextView"
+            android:layout_width="85dp"
+            android:layout_height="32dp"
+            android:text="Starting:"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </RadioGroup>
+
+    <EditText
+        android:id="@+id/recurringDatePicker"
+        android:layout_width="149dp"
+        android:layout_height="51dp"
+        android:ems="10"
+        android:hint="@string/date_box_hint"
+        android:imeOptions="actionDone"
+        android:importantForAutofill="no"
+        android:inputType="date"
+        android:textAlignment="center"
+        android:textIsSelectable="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recurrenceRadioGroup" />
+
+
+    <!--Uses https://www.youtube.com/watch?v=m7TJha6zlN0 as a guide to the buttons-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

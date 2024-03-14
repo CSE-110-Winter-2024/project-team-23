@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator.ui;
 
-import android.content.Context;
+
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
@@ -17,10 +18,11 @@ import java.util.List;
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.ListItemGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import edu.ucsd.cse110.successorator.lib.domain.Context;
 
 public class GoalListAdapter extends ArrayAdapter<Goal> {
     private MainViewModel mainViewModel;
-    public GoalListAdapter(@NonNull Context context, @NonNull List<Goal> goals, MainViewModel mainViewModel) {
+    public GoalListAdapter(@NonNull android.content.Context context, @NonNull List<Goal> goals, MainViewModel mainViewModel) {
         super(context, 0, new ArrayList<>(goals));
         this.mainViewModel = mainViewModel;
     }
@@ -51,6 +53,22 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         else {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             binding.background.setBackgroundColor(Color.WHITE);
+        }
+
+        /*
+        Logic for color of the list context icon
+         */
+        if (goal.context()==Context.HOME) {
+            binding.imageView.setColorFilter(Color.parseColor("#faf04d"));
+        }
+        if (goal.context()==Context.WORK) {
+            binding.imageView.setColorFilter(Color.parseColor("#31c7f8"));
+        }
+        if (goal.context()==Context.SCHOOL) {
+            binding.imageView.setColorFilter(Color.parseColor("#c95bf9"));
+        }
+        if (goal.context()==Context.ERRANDS) {
+            binding.imageView.setColorFilter(Color.parseColor("#a2cb84"));
         }
 
 
