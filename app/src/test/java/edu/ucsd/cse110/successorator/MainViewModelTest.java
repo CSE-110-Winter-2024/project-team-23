@@ -1,6 +1,10 @@
 package edu.ucsd.cse110.successorator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -158,6 +162,28 @@ public class MainViewModelTest {
         // Verify that no goals are visible
         assertIncompleteCount(3);
         assertCompleteCount(0);
+    }
+
+    @Test
+    public void testGetGoalContent() {
+        goalRepository = null;
+        goalRepository = MockGoalRepository.createWithAllRecurranceTypeTestGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        System.out.println(goalRepository.goals.get(0).getValue().toString());
+        mainViewModel.activateTodayView();
+        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.));
+        assertEquals("Goal 2", mainViewModel.getGoalContent(goalRepository.findGoal(2)));
+        assertEquals("Goal 3", mainViewModel.getGoalContent(goalRepository.findGoal(3)));
+        assertEquals("Goal 4", mainViewModel.getGoalContent(goalRepository.findGoal(4)));
+        assertEquals("Goal 5", mainViewModel.getGoalContent(goalRepository.findGoal(5)));
+
+        mainViewModel.activateRecurringView();
+        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.goals.get(0).getValue()));
+        assertEquals("Goal 2, Daily", mainViewModel.getGoalContent(goalRepository.goals.get(1).getValue()));
+        assertEquals("Goal 3, Weekly", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
+        assertEquals("Goal 4, Monthly", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
+        assertEquals("Goal 5, Yearly", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
     }
 
     @Test
@@ -391,7 +417,7 @@ public class MainViewModelTest {
 
         //Step 1
         //Sets up time to be March 7th, 2024
-        dateTicker.setValue(TimeUtils.getStartTime()+TimeUtils.DAY_LENGTH*28);
+        dateTicker.setValue(TimeUtils.getStartTime() + TimeUtils.DAY_LENGTH * 28);
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
         //Steps 2 to 5
@@ -410,14 +436,14 @@ public class MainViewModelTest {
         mainViewModel.activateTodayView();
         var displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="10km run") {
+            if (displayedGoals.get(i).content() == "10km run") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
             }
         }
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="    ") {
+            if (displayedGoals.get(i).content() == "    ") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -426,7 +452,7 @@ public class MainViewModelTest {
         //Step 7, trying to complete a goal that shouldn't be
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertFalse(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -436,7 +462,7 @@ public class MainViewModelTest {
         mainViewModel.activateTodayView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -444,7 +470,7 @@ public class MainViewModelTest {
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -464,7 +490,7 @@ public class MainViewModelTest {
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertFalse(displayedGoals.get(i).completed());
                 break;
             }
@@ -489,7 +515,6 @@ public class MainViewModelTest {
         mainViewModel.addGoal("school", Context.SCHOOL);
         assertCompleteCount(0);
         assertIncompleteCount(4);
-
 
 
         //WIP logic to filter by context
@@ -760,6 +785,7 @@ public class MainViewModelTest {
         mainViewModel.activateRecurringView();
         assertIncompleteCount(1);
     }
+
     @Test
     public void MS2_US6Scenario3() {
         goalRepository = MockGoalRepository.createWithEmptyGoals();
@@ -1029,8 +1055,6 @@ public class MainViewModelTest {
         //assert there are no goals
 
     }
-
-
 
 
 }

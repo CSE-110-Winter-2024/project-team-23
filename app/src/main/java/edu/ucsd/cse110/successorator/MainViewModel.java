@@ -585,8 +585,3 @@ public class MainViewModel extends ViewModel {
 
     }
 }
-
-//    public AppMode getCurrentMode() {
-//        return currentMode.getValue();
-//    }
-//}
