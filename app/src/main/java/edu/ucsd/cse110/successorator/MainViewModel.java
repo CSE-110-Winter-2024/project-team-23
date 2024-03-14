@@ -51,8 +51,8 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Calendar> currentDateLocalized;
     private final MutableSubject<String> currentTitleString;
     private final MutableSubject<String> currentWeekday;
-    private final MutableSubject<String> currentNumberedWeekday;
-    private final MutableSubject<String> currentDateString;
+    private final MutableSubject<String> monthlyButtonString;
+    private final MutableSubject<String> yearlyButtonString;
     private final MutableSubject<Context> currentContext;
     private final MutableSubject<AppMode> currentMode;
     private final Calendar dateConverter;
@@ -87,8 +87,8 @@ public class MainViewModel extends ViewModel {
         this.currentDateLocalized = new SimpleSubject<>();
         this.currentTitleString = new SimpleSubject<>();
         this.currentWeekday = new SimpleSubject<>();
-        this.currentNumberedWeekday = new SimpleSubject<>();
-        this.currentDateString = new SimpleSubject<>();
+        this.monthlyButtonString = new SimpleSubject<>();
+        this.yearlyButtonString = new SimpleSubject<>();
         this.currentMode = new SimpleSubject<>();
         this.currentMode.setValue(AppMode.TODAY);
 
@@ -291,11 +291,7 @@ public class MainViewModel extends ViewModel {
                     return false;
                 }
             }
-        } else if (appMode.equals(AppMode.RECURRING)) {
-            this.deleteRecurringGoal(goalId);
-            return true;
         }
-
         if (goal.completed()) {
             var newGoal = goal.markIncomplete();
             goalRepository.update(newGoal);
@@ -313,7 +309,6 @@ public class MainViewModel extends ViewModel {
     }
 
     // Open question whether this method should take a Context or a String
-    // TODO: test these methods in the PRs where they actually start being used
     public void activateFocusMode(Context context) {
         this.currentContext.setValue(context);
     }
@@ -351,16 +346,16 @@ public class MainViewModel extends ViewModel {
     }
 
     // Exporting these strings for UI
-    public Subject<String> getCurrentWeekday() {
+    public Subject<String> getWeeklyButtonString() {
         return currentWeekday;
     }
 
-    public Subject<String> getCurrentNumberedWeekday() {
-        return currentNumberedWeekday;
+    public Subject<String> getMonthlyButtonString() {
+        return monthlyButtonString;
     }
 
-    public Subject<String> getCurrentDateString() {
-        return currentDateString;
+    public Subject<String> getYearlyButtonString() {
+        return yearlyButtonString;
     }
 
     public Subject<AppMode> getCurrentMode() {
@@ -391,7 +386,7 @@ public class MainViewModel extends ViewModel {
 
         formatter.applyPattern("EEE");
         var weekday = formatter.format(displayDate.getTime());
-        this.currentWeekday.setValue(weekday);
+        this.currentWeekday.setValue("Weekly on " + weekday);
 
         var weekday_num = displayDate.get(Calendar.DAY_OF_WEEK_IN_MONTH);
         var weekday_string = Integer.toString(weekday_num);
@@ -404,11 +399,11 @@ public class MainViewModel extends ViewModel {
         } else {
             weekday_string += "th";
         }
-        this.currentNumberedWeekday.setValue(weekday_string + " " + weekday);
+        this.monthlyButtonString.setValue("Monthly on " + weekday_string + " " + weekday);
 
         formatter.applyPattern("M/d");
         dateString = formatter.format(displayDate.getTime());
-        this.currentDateString.setValue(dateString);
+        this.yearlyButtonString.setValue("Yearly on " + dateString);
     }
 
 
@@ -417,6 +412,11 @@ public class MainViewModel extends ViewModel {
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
         if (currentTime == null) return;
+        var appMode = this.currentMode.getValue();
+        if (appMode == null) return;
+        if (appMode.equals(TOMORROW)) {
+            currentTime += 24 * 60 * 60 * 1000;
+        }
         var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
         goalRepository.append(newGoal);
     }
@@ -430,6 +430,8 @@ public class MainViewModel extends ViewModel {
 
     // Returns true if the goal was added, or false if it wasn't (due to the selected date being in the past)
     public boolean addRecurringGoal(String contents, int year, int month, int day, RecurrenceType recurrenceType, Context context) {
+        if (context == null) return false;
+        if (recurrenceType == null) return false;
         var currentTime = this.currentDateLocalized.getValue();
         if (currentTime == null) return false;
         var selectedDate = (Calendar) currentTime.clone();
@@ -437,15 +439,15 @@ public class MainViewModel extends ViewModel {
         // Decremented month by 1 because it is zero indexed
         selectedDate.set(year, month - 1, day, 12, 0, 0);
         //  Is this a bug? It seems like we are checking if selected date is equal to itself
-        //  if (selectedDate.get(Calendar.DAY_OF_MONTH) == day && selectedDate.get(Calendar.YEAR) == year && selectedDate.get(Calendar.MONTH) == month) {
-        //      return false;
-        //  }
+        if (selectedDate.get(Calendar.DAY_OF_MONTH) != day || selectedDate.get(Calendar.YEAR) != year && selectedDate.get(Calendar.MONTH) != month) {
+            return false;
+        }
         currentTime = TimeUtils.twoAMNormalized(currentTime);
         if (selectedDate.before(currentTime)) return false;
         var selectedMoment = selectedDate.getTimeInMillis();
-        var recurringGoal = new Goal(null, contents, 0, false, selectedMoment, false, true, recurrenceType, context, selectedDate.getTimeInMillis(), null, null, null, false);
+        var recurringGoal = new Goal(null, contents, 0, false, selectedMoment, false, true, recurrenceType, context, selectedMoment, null, null, null, false);
         var goalId = goalRepository.append(recurringGoal);
-        recurringGoal = goalRepository.findGoal(goalId);
+        recurringGoal = goalRepository.findGoal(goalId); // Populate object with db id
         handleRecurringGoalGeneration(recurringGoal, currentTime);
         return true;
     }
@@ -582,6 +584,6 @@ public class MainViewModel extends ViewModel {
                 }
             }
         }
-
     }
 }
+

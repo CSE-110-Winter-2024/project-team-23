@@ -44,8 +44,8 @@ public class TimeUtils {
         }
     }
 
-    // TODO: implement this and test when you write task 4.1
     public static boolean shouldShowIncompleteGoalTomorrow(Calendar nowLocalized, Calendar startTime) {
+        // Remember nowLocalized is "tomorrow" not now
         var today2am = (Calendar) nowLocalized.clone();
         today2am.set(Calendar.HOUR_OF_DAY, 2);
         var yesterday2am = (Calendar) today2am.clone();
