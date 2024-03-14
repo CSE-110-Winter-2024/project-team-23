@@ -365,7 +365,7 @@ public class MainViewModelTest {
         mainViewModel.addGoal("Install game update", Context.HOME);
         mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
         assertCompleteCount(0);
-        assertIncompleteCount(1);
+        assertIncompleteCount(2);
 
         //Steps 15 to 24
         mainViewModel.activatePendingView();
