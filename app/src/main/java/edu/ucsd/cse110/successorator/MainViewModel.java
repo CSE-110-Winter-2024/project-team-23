@@ -308,7 +308,6 @@ public class MainViewModel extends ViewModel {
     }
 
     // Open question whether this method should take a Context or a String
-    // TODO: test these methods in the PRs where they actually start being used
     public void activateFocusMode(Context context) {
         this.currentContext.setValue(context);
     }
