@@ -39,11 +39,11 @@ public class MockGoalRepository implements GoalRepository {
     );
 
     private final static List<Goal> ALL_RECURRENCE_TEST_GOALS = List.of(
-            new Goal(1, "Goal 1", 1, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, false, RecurrenceType.NONE, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, 1, null, true),
-            new Goal(2, "Goal 2", 2, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.DAILY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, 0, 2, null, false),
-            new Goal(3, "Goal 3", 3, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.WEEKLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, 1, 3, null, false),
-            new Goal(4, "Goal 4", 4, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.MONTHLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, 2, 4, null, false),
-            new Goal(5, "Goal 5", 5, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.YEARLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, 3, null, null, false)
+            new Goal(1, "Goal 1", 1, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, false, RecurrenceType.NONE, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(2, "Goal 2", 2, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.DAILY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(3, "Goal 3", 3, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.WEEKLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(4, "Goal 4", 4, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.MONTHLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(5, "Goal 5", 5, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.YEARLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false)
     );
 
     public static MockGoalRepository createWithDefaultGoals() {
@@ -58,7 +58,7 @@ public class MockGoalRepository implements GoalRepository {
         return new MockGoalRepository(RECCURING_TEST_GOALS);
     }
 
-    public static MockGoalRepository createWithAllRecurranceTypeTestGoals() {
+    public static MockGoalRepository createWithAllRecurrenceTypeTestGoals() {
         return new MockGoalRepository(ALL_RECURRENCE_TEST_GOALS);
     }
 

@@ -166,24 +166,22 @@ public class MainViewModelTest {
 
     @Test
     public void testGetGoalContent() {
-        goalRepository = null;
-        goalRepository = MockGoalRepository.createWithAllRecurranceTypeTestGoals();
+        goalRepository = MockGoalRepository.createWithAllRecurrenceTypeTestGoals();
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
-        System.out.println(goalRepository.goals.get(0).getValue().toString());
         mainViewModel.activateTodayView();
-        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.));
-        assertEquals("Goal 2", mainViewModel.getGoalContent(goalRepository.findGoal(2)));
-        assertEquals("Goal 3", mainViewModel.getGoalContent(goalRepository.findGoal(3)));
-        assertEquals("Goal 4", mainViewModel.getGoalContent(goalRepository.findGoal(4)));
-        assertEquals("Goal 5", mainViewModel.getGoalContent(goalRepository.findGoal(5)));
+        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.goals.get(0).getValue()));
+        assertEquals("Goal 2", mainViewModel.getGoalContent(goalRepository.goals.get(1).getValue()));
+        assertEquals("Goal 3", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
+        assertEquals("Goal 4", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
+        assertEquals("Goal 5", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
 
         mainViewModel.activateRecurringView();
         assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.goals.get(0).getValue()));
         assertEquals("Goal 2, Daily", mainViewModel.getGoalContent(goalRepository.goals.get(1).getValue()));
-        assertEquals("Goal 3, Weekly", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
-        assertEquals("Goal 4, Monthly", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
-        assertEquals("Goal 5, Yearly", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
+        assertEquals("Goal 3, Weekly on Wednesday", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
+        assertEquals("Goal 4, Monthly on 1st Wednesday", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
+        assertEquals("Goal 5, Yearly on 2/7", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
     }
 
     @Test
