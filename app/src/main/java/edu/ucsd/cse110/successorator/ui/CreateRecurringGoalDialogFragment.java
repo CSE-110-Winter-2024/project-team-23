@@ -53,6 +53,7 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateRecurringGoalBinding.inflate(getLayoutInflater());
 
+        // Hook up prompt text to the view model
 
 
         // Create listener for context buttons

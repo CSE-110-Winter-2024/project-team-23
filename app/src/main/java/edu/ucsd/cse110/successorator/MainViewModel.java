@@ -50,8 +50,8 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Calendar> currentDateLocalized;
     private final MutableSubject<String> currentTitleString;
     private final MutableSubject<String> currentWeekday;
-    private final MutableSubject<String> currentNumberedWeekday;
-    private final MutableSubject<String> currentDateString;
+    private final MutableSubject<String> monthlyButtonString;
+    private final MutableSubject<String> yearlyButtonString;
     private final MutableSubject<Context> currentContext;
     private final MutableSubject<AppMode> currentMode;
     private final Calendar dateConverter;
@@ -86,8 +86,8 @@ public class MainViewModel extends ViewModel {
         this.currentDateLocalized = new SimpleSubject<>();
         this.currentTitleString = new SimpleSubject<>();
         this.currentWeekday = new SimpleSubject<>();
-        this.currentNumberedWeekday = new SimpleSubject<>();
-        this.currentDateString = new SimpleSubject<>();
+        this.monthlyButtonString = new SimpleSubject<>();
+        this.yearlyButtonString = new SimpleSubject<>();
         this.currentMode = new SimpleSubject<>();
         this.currentMode.setValue(AppMode.TODAY);
 
@@ -345,16 +345,16 @@ public class MainViewModel extends ViewModel {
     }
 
     // Exporting these strings for UI
-    public Subject<String> getCurrentWeekday() {
+    public Subject<String> getWeeklyButtonString() {
         return currentWeekday;
     }
 
-    public Subject<String> getCurrentNumberedWeekday() {
-        return currentNumberedWeekday;
+    public Subject<String> getMonthlyButtonString() {
+        return monthlyButtonString;
     }
 
-    public Subject<String> getCurrentDateString() {
-        return currentDateString;
+    public Subject<String> getYearlyButtonString() {
+        return yearlyButtonString;
     }
 
     public Subject<AppMode> getCurrentMode() {
@@ -385,7 +385,7 @@ public class MainViewModel extends ViewModel {
 
         formatter.applyPattern("EEE");
         var weekday = formatter.format(displayDate.getTime());
-        this.currentWeekday.setValue(weekday);
+        this.currentWeekday.setValue("Weekly on " + weekday);
 
         var weekday_num = displayDate.get(Calendar.DAY_OF_WEEK_IN_MONTH);
         var weekday_string = Integer.toString(weekday_num);
@@ -398,11 +398,11 @@ public class MainViewModel extends ViewModel {
         } else {
             weekday_string += "th";
         }
-        this.currentNumberedWeekday.setValue(weekday_string + " " + weekday);
+        this.monthlyButtonString.setValue("Monthly on " + weekday_string + " " + weekday);
 
         formatter.applyPattern("M/d");
         dateString = formatter.format(displayDate.getTime());
-        this.currentDateString.setValue(dateString);
+        this.yearlyButtonString.setValue("Yearly on " + dateString);
     }
 
 

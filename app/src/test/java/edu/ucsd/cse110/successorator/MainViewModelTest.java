@@ -163,38 +163,47 @@ public class MainViewModelTest {
     @Test
     public void testCalendarStreings() {
         // Verify that the current date string is correct
-        // Test the weekday and m/d strings as well, but the nth weekday gets its own test
+        // Test the weekday and m/d strings as well
         var currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Wed 2/7", currentDateString);
-        var currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        var currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Wed", currentWeekdayString);
-        var currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Wed", currentWeekdayString);
+        var currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 1st Wed", currentMonthDayString);
+        var currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/7", currentDateString2);
+        assertEquals("Yearly on 2/7", currentDateString2);
         // advance 9 hours and verify no change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 9);
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Wed 2/7", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Wed", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Wed", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 1st Wed", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/7", currentDateString2);
+        assertEquals("Yearly on 2/7", currentDateString2);
         // Advance another 2 and verify change
         dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.HOUR_LENGTH * 11);
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Thu 2/8", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Thu", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Thu", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Thu", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/8", currentDateString2);
+        assertEquals("Yearly on 2/8", currentDateString2);
         // Now test different app modes
         mainViewModel.activatePendingView();
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
@@ -204,12 +213,15 @@ public class MainViewModelTest {
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Tomorrow, Fri 2/9", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Fri", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Fri", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Fri", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/9", currentDateString2);
+        assertEquals("Yearly on 2/9", currentDateString2);
         mainViewModel.activateRecurringView();
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
@@ -218,13 +230,29 @@ public class MainViewModelTest {
         currentDateString = mainViewModel.getCurrentTitleString().getValue();
         assertNotNull(currentDateString);
         assertEquals("Today, Thu 2/8", currentDateString);
-        currentWeekdayString = mainViewModel.getCurrentWeekday().getValue();
+        currentWeekdayString = mainViewModel.getWeeklyButtonString().getValue();
         assertNotNull(currentWeekdayString);
-        assertEquals("Thu", currentWeekdayString);
-        currentDateString2 = mainViewModel.getCurrentDateString().getValue();
+        assertEquals("Weekly on Thu", currentWeekdayString);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 2nd Thu", currentMonthDayString);
+        currentDateString2 = mainViewModel.getYearlyButtonString().getValue();
         assertNotNull(currentDateString2);
-        assertEquals("2/8", currentDateString2);
-
+        assertEquals("Yearly on 2/8", currentDateString2);
+        // Special case for 3rd, 4th, 5th
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 8);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 3rd Thu", currentMonthDayString);
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 15);
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 4th Thu", currentMonthDayString);
+        dateTicker.setValue(TimeUtils.START_TIME + TimeUtils.DAY_LENGTH * 22);
+        // Take advantage of leap year to make this test easy
+        currentMonthDayString = mainViewModel.getMonthlyButtonString().getValue();
+        assertNotNull(currentMonthDayString);
+        assertEquals("Monthly on 5th Thu", currentMonthDayString);
     }
 
     @Test
