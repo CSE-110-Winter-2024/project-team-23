@@ -3,15 +3,14 @@ package edu.ucsd.cse110.successorator.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
-
-import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateRecurringGoalBinding;
@@ -51,13 +50,12 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
 
     @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         this.view = FragmentDialogCreateRecurringGoalBinding.inflate(getLayoutInflater());
 
         // Hook up prompt text to the view model
 
-
-        // Create listener for context buttons
+        // Create listener for recurrence buttons
         this.view.recurrenceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == this.view.dailyRecurringGoalButton.getId()) {
                 this.recurrenceType = RecurrenceType.DAILY;
@@ -92,12 +90,9 @@ public class CreateRecurringGoalDialogFragment extends DialogFragment {
 
             String[] parts = view.recurringDatePicker.getText().toString().split("/");
             if (parts.length == 3) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String content = view.goalInput.getText().toString();
-                    //Context is defaulted to HOME, Needs US3 to be implemented.
-
-                    boolean success = mainViewModel.addRecurringGoal(content,Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]),
-                            recurrenceType, context);
+                    boolean success = (boolean) mainViewModel.addRecurringGoal(content, Integer.parseInt(parts[2]), Integer.parseInt(parts[0]) - 1, Integer.parseInt(parts[1]), recurrenceType, context);
                     if (!success) {
                         // Display a popup telling the user to correct their date or select a context
                         // https://stackoverflow.com/questions/2115758/how-do-i-display-an-alert-dialog-on-android
