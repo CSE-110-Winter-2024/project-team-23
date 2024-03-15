@@ -172,14 +172,19 @@ public class MainActivity extends AppCompatActivity {
         boolean clicked = true;
         if (itemId == R.id.home_popup) {
             this.mainViewModel.setFocusHome();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_home);
         } else if (itemId == R.id.work_popup) {
             this.mainViewModel.setFocusWork();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_work);
         } else if (itemId == R.id.school_popup) {
             this.mainViewModel.setFocusSchool();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_school);
         } else if (itemId == R.id.errands_popup) {
             this.mainViewModel.setFocusErrands();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_errands);
         } else if (itemId == R.id.cancel_popup) {
             this.mainViewModel.deactivateFocusMode();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger);
         } else {
             clicked = false;
         }

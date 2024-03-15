@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="home_color">#faf04d</color>
+    <color name="work_color">#31c7f8</color>
+    <color name="school_color">#c95bf9</color>
+    <color name="errands_color">#a2cb84</color>
 </resources>
