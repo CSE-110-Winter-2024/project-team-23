@@ -1180,15 +1180,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select finish, move pending goal to today logic
-        //assertCompleteCount(1); //assert goal is completed
-        //assert the goal's pending is now false
+
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
+
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.finishFromPending(goal);
+        assertIncompleteCount(0);
+        mainViewModel.activateTodayView();
+        assertCompleteCount(1); //assert goal is on today view
+        assertIncompleteCount(0);
         mainViewModel.activateTomorrowView();
-        //assert the goal is on today view
-
-
+        assertCompleteCount(0); //assert goal is not on tmr view
+        assertIncompleteCount(0);
     }
 
     @Test
@@ -1200,11 +1205,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select delete logic
-        //assert there are no goals
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
 
+        mainViewModel.deleteGoal(goal.id());
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
     }
 
 
