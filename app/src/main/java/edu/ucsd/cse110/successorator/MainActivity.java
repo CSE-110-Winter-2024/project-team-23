@@ -19,10 +19,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.CreateRecurringGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
@@ -72,9 +74,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 //Pending logic so that click does nothing
+
                 var appMode = mainViewModel.getCurrentMode().getValue();
 
-                if (appMode == AppMode.PENDING || appMode == appMode.RECURRING) {
+                if (appMode == AppMode.PENDING || appMode == AppMode.RECURRING) {
                     // Do nothing
                 } else {
                     boolean success = mainViewModel.pressGoal(Math.toIntExact(id));
@@ -195,17 +198,42 @@ public class MainActivity extends AppCompatActivity {
     // https://stackoverflow.com/questions/9114912/what-is-context-menu-method-registerforcontextmenu
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        menu.add(Menu.NONE, 1, Menu.NONE, "Today");
-        menu.add(Menu.NONE, 1, Menu.NONE, "Tomorrow");
-        menu.add(Menu.NONE, 1, Menu.NONE, "Finish");
-        menu.add(Menu.NONE, 1, Menu.NONE, "Delete");
+        if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+            menu.add(Menu.NONE, 1, Menu.NONE, "Today");
+            menu.add(Menu.NONE, 1, Menu.NONE, "Tomorrow");
+            menu.add(Menu.NONE, 1, Menu.NONE, "Finish");
+        }
+        if (mainViewModel.getCurrentMode().getValue() == AppMode.RECURRING || mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+            menu.add(Menu.NONE, 1, Menu.NONE, "Delete");
+        }
     }
 
     //This should handle the logic, examples online uses switch cases
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        return false;
+        AdapterView.AdapterContextMenuInfo contextMenuInfo =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        var position = contextMenuInfo.position;
+        Goal goal = listAdapter.getItem(position);
+        switch (Objects.requireNonNull(item.getTitle()).toString()) {
+            case "Today":
+                mainViewModel.moveFromPendingToToday(goal);
+                return true;
+            case "Tomorrow":
+                mainViewModel.moveFromPendingToTomorrow(goal);
+                return true;
+            case "Finish":
+                mainViewModel.finishFromPending(goal);
+                return true;
+            case "Delete":
+                if (mainViewModel.getCurrentMode().getValue() == AppMode.RECURRING) {
+                    mainViewModel.deleteRecurringGoal(goal.id());
+                } else {
+                    mainViewModel.deleteGoal(goal.id());
+                }
+                return true;
+            default:
+                return false;
+        }
     }
-
-
 }

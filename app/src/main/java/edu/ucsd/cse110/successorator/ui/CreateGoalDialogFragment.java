@@ -9,19 +9,26 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
+
+import android.view.View;
+
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentDialogCreateGoalBinding;
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
+import edu.ucsd.cse110.successorator.lib.domain.RecurrenceType;
 
 
 public class CreateGoalDialogFragment extends DialogFragment {
     private FragmentDialogCreateGoalBinding view;
     //Not this most flexible name but the least ambiguous.
     private MainViewModel mainViewModel;
+    private RecurrenceType recurrenceType = RecurrenceType.NONE;
+
 
     private Context context;
 
@@ -70,6 +77,25 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 this.context = Context.ERRANDS;
             }
         });
+
+
+        // pending goals don't need to be assigned a time
+        if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
+            this.view.recurrenceRadio.setVisibility(View.GONE);
+        } else {
+          // Create listener for recurrence buttons
+          this.view.recurrenceRadio.setOnCheckedChangeListener((group, checkedId) -> {
+              if (checkedId == this.view.DailyRecurringGoalButton.getId()) {
+                  this.recurrenceType = RecurrenceType.DAILY;
+              } else if (checkedId == this.view.WeeklyRecurringGoalButton.getId()) {
+                  this.recurrenceType = RecurrenceType.WEEKLY;
+              } else if (checkedId == this.view.MonthlyRecurringGoalButton.getId()) {
+                  this.recurrenceType = RecurrenceType.MONTHLY;
+              } else if (checkedId == this.view.YearlyRecurringGoalButton.getId()) {
+                  this.recurrenceType = RecurrenceType.YEARLY;
+              }
+          });
+        }
 
         //Create listener for enter key.
         //Interface containing method called anytime enter key is pressed.

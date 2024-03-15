@@ -1,6 +1,5 @@
 package edu.ucsd.cse110.successorator.lib.domain;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +38,14 @@ public class MockGoalRepository implements GoalRepository {
             new Goal(3, "Goal 1", 3, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4 + TimeUtils.DAY_LENGTH, false, false, RecurrenceType.NONE, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4 + TimeUtils.DAY_LENGTH, 2, null, 1, true)
     );
 
+    private final static List<Goal> ALL_RECURRENCE_TEST_GOALS = List.of(
+            new Goal(1, "Goal 1", 1, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, false, RecurrenceType.NONE, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(2, "Goal 2", 2, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.DAILY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(3, "Goal 3", 3, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.WEEKLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(4, "Goal 4", 4, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.MONTHLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false),
+            new Goal(5, "Goal 5", 5, false, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, false, true, RecurrenceType.YEARLY, Context.HOME, TimeUtils.START_TIME - TimeUtils.HOUR_LENGTH * 4, null, null, null, false)
+    );
+
     public static MockGoalRepository createWithDefaultGoals() {
         return new MockGoalRepository(DEFAULT_GOALS_SIMPLE_CASE);
     }
@@ -51,12 +58,16 @@ public class MockGoalRepository implements GoalRepository {
         return new MockGoalRepository(RECCURING_TEST_GOALS);
     }
 
+    public static MockGoalRepository createWithAllRecurrenceTypeTestGoals() {
+        return new MockGoalRepository(ALL_RECURRENCE_TEST_GOALS);
+    }
+
     public static MockGoalRepository createWithEmptyGoals() {
         return new MockGoalRepository(new ArrayList<>());
     }
 
     public MockGoalRepository(List<Goal> goals) {
-    this.goals = new ArrayList<>();
+        this.goals = new ArrayList<>();
         for (Goal goal : goals) {
             var subject = new SimpleSubject<Goal>();
             subject.setValue(goal);

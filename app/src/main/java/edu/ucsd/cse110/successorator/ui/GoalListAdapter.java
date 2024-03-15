@@ -1,13 +1,11 @@
 package edu.ucsd.cse110.successorator.ui;
 
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -17,11 +15,12 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.ListItemGoalBinding;
-import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.Context;
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
 public class GoalListAdapter extends ArrayAdapter<Goal> {
     private MainViewModel mainViewModel;
+
     public GoalListAdapter(@NonNull android.content.Context context, @NonNull List<Goal> goals, MainViewModel mainViewModel) {
         super(context, 0, new ArrayList<>(goals));
         this.mainViewModel = mainViewModel;
@@ -45,12 +44,11 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         Strike through reference:
         https://stackoverflow.com/questions/3881553/is-there-an-easy-way-to-strike-through-text-in-an-app-widget/6739637
          */
-        binding.goalText.setText(goal.content());
+        binding.goalText.setText(mainViewModel.getGoalContent(goal));
         if (goal.completed()) {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             binding.background.setBackgroundColor(Color.LTGRAY);
-        }
-        else {
+        } else {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             binding.background.setBackgroundColor(Color.WHITE);
         }
@@ -58,19 +56,18 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         /*
         Logic for color of the list context icon
          */
-        if (goal.context()==Context.HOME) {
+        if (goal.context() == Context.HOME) {
             binding.imageView.setColorFilter(Color.parseColor("#faf04d"));
         }
-        if (goal.context()==Context.WORK) {
+        if (goal.context() == Context.WORK) {
             binding.imageView.setColorFilter(Color.parseColor("#31c7f8"));
         }
-        if (goal.context()==Context.SCHOOL) {
+        if (goal.context() == Context.SCHOOL) {
             binding.imageView.setColorFilter(Color.parseColor("#c95bf9"));
         }
-        if (goal.context()==Context.ERRANDS) {
+        if (goal.context() == Context.ERRANDS) {
             binding.imageView.setColorFilter(Color.parseColor("#a2cb84"));
         }
-
 
 
         return binding.getRoot();

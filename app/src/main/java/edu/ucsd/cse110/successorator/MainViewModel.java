@@ -5,6 +5,7 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+import static edu.ucsd.cse110.successorator.lib.util.TimeUtils.nthDayofWeek;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
@@ -231,7 +232,7 @@ public class MainViewModel extends ViewModel {
             var filteredGoals = goals.stream().filter(goal -> {
                 if (goal.recurringGenerated()) {
                     if (recurrenceIds.get(goal.recurrenceId()).id() != goal.id()) {
-                        this.goalRepository.remove(goal.id());
+                        deleteGoal(goal.id());
                         return false;
                     }
                 }
@@ -364,8 +365,13 @@ public class MainViewModel extends ViewModel {
         return monthlyButtonString;
     }
 
+
+    public Subject<Calendar> getCurrentDateLocalized() {
+        return currentDateLocalized;
+    }
     public Subject<String> getYearlyButtonString() {
         return yearlyButtonString;
+
     }
 
     public Subject<AppMode> getCurrentMode() {
@@ -417,18 +423,19 @@ public class MainViewModel extends ViewModel {
     }
 
 
-    public void addGoal(String contents, Context context) {
+    public int addGoal(String contents, Context context) {
         // We could use a proper value for the completion date, but we don't really care about it
         // At the same time, I don't want to deal with nulls, so I'll just use the current time
         var currentTime = this.currentDate.getValue();
-        if (currentTime == null) return;
+
+        if (currentTime == null) return -1;
         var appMode = this.currentMode.getValue();
-        if (appMode == null) return;
+        if (appMode == null) return -1;
         if (appMode.equals(TOMORROW)) {
             currentTime += 24 * 60 * 60 * 1000;
         }
         var newGoal = new Goal(null, contents, 0, false, currentTime, false, false, RecurrenceType.NONE, context, currentTime, null, null, null, false);
-        goalRepository.append(newGoal);
+        return goalRepository.append(newGoal);
     }
 
     public void addPendingGoal(String contents, Context context) {
@@ -482,6 +489,28 @@ public class MainViewModel extends ViewModel {
         handleRecurringGoalGeneration(recurringGoal, currentTime);
     }
 
+    // Method that adds date text when a recurring goal will reoccur
+    public String getGoalContent(Goal goal) {
+        if (currentMode.getValue() == AppMode.RECURRING) {
+            var startDate = TimeUtils.localize(goal.startDate(), dateConverter);
+
+            switch (goal.recurrenceType()) {
+                case DAILY:
+                    return goal.content() + ", Daily";
+                case WEEKLY:
+                    return goal.content() + ", Weekly on " + startDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                case MONTHLY:
+                    return goal.content() + ", Monthly on " + nthDayofWeek(startDate);
+                case YEARLY:
+                    return goal.content() + ", Yearly on " + (startDate.get(Calendar.MONTH) + 1) + "/" + startDate.get(Calendar.DAY_OF_MONTH);
+                default:
+                    return goal.content();
+            }
+        } else {
+            return goal.content();
+        }
+    }
+
     // Public for testing
     // Only call from a context where it won't recurse into LiveData updates
     public void handleRecurringGoalGeneration(Goal recurringGoal, Calendar currentDate) {
@@ -515,7 +544,7 @@ public class MainViewModel extends ViewModel {
             goalRepository.update(nextGoal);
             var prevGoal = recurringGoal.prevId();
             if (prevGoal != null) {
-                goalRepository.remove(prevGoal);
+                deleteGoal(prevGoal);
             }
             recurringGoal = recurringGoal.withPrevId(nextGoal.id());
             recurringGoal = recurringGoal.withNextId(newId);
@@ -543,10 +572,15 @@ public class MainViewModel extends ViewModel {
             goalRepository.update(nextGoal);
             recurringGoal = recurringGoal.withPrevId(newId);
             goalRepository.update(recurringGoal);
-            goalRepository.remove(prevId);
+            deleteGoal(prevId);
         }
     }
 
+    public void deleteGoal(int goalId) {
+        this.goalRepository.remove(goalId);
+    }
+    
+    
     public void deleteRecurringGoal(int goalId) {
         // We were explicitly told in clarifications to not delete generated goals if in
         // today or tomorrow
@@ -554,7 +588,7 @@ public class MainViewModel extends ViewModel {
         if (recurringGoal == null || !recurringGoal.recurring()) return;
         // Don't need to check prevGoal instance; it is always either not visible (don't care)
         // or is visible (must keep)
-        this.goalRepository.remove(goalId);
+        deleteGoal(goalId);
 
         var nextId = recurringGoal.nextId();
 
@@ -567,11 +601,33 @@ public class MainViewModel extends ViewModel {
                 var nowLocalized = currentDateLocalized.getValue();
                 if (nowLocalized == null) return;
                 if (!tomorrowFilter.shouldShow(nextGoal, nowLocalized)) {
-                    this.goalRepository.remove(nextId);
+                    deleteGoal(nextId);
                 }
             }
         }
-
-
     }
+
+    public void moveFromPendingToToday(Goal goal) {
+        activateTodayView();
+        deleteGoal(goal.id());
+        addGoal(goal.content(), goal.context());
+        activatePendingView();
+    }
+
+    public void moveFromPendingToTomorrow(Goal goal) {
+        activateTomorrowView();
+        deleteGoal(goal.id());
+        addGoal(goal.content(), goal.context());
+        activatePendingView();
+    }
+
+    public void finishFromPending(Goal goal) {
+        activateTodayView();
+        deleteGoal(goal.id());
+        int goalId = addGoal(goal.content(),
+                goal.context());
+        pressGoal(goalId);
+        activatePendingView();
+    }
+
 }

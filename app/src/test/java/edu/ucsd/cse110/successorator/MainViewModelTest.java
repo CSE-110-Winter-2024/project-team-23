@@ -1,6 +1,10 @@
 package edu.ucsd.cse110.successorator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -158,6 +162,26 @@ public class MainViewModelTest {
         // Verify that no goals are visible
         assertIncompleteCount(3);
         assertCompleteCount(0);
+    }
+
+    @Test
+    public void testGetGoalContent() {
+        goalRepository = MockGoalRepository.createWithAllRecurrenceTypeTestGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        mainViewModel.activateTodayView();
+        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.goals.get(0).getValue()));
+        assertEquals("Goal 2", mainViewModel.getGoalContent(goalRepository.goals.get(1).getValue()));
+        assertEquals("Goal 3", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
+        assertEquals("Goal 4", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
+        assertEquals("Goal 5", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
+
+        mainViewModel.activateRecurringView();
+        assertEquals("Goal 1", mainViewModel.getGoalContent(goalRepository.goals.get(0).getValue()));
+        assertEquals("Goal 2, Daily", mainViewModel.getGoalContent(goalRepository.goals.get(1).getValue()));
+        assertEquals("Goal 3, Weekly on Wednesday", mainViewModel.getGoalContent(goalRepository.goals.get(2).getValue()));
+        assertEquals("Goal 4, Monthly on 1st Wednesday", mainViewModel.getGoalContent(goalRepository.goals.get(3).getValue()));
+        assertEquals("Goal 5, Yearly on 2/7", mainViewModel.getGoalContent(goalRepository.goals.get(4).getValue()));
     }
 
     @Test
@@ -419,7 +443,7 @@ public class MainViewModelTest {
 
         //Step 1
         //Sets up time to be March 7th, 2024
-        dateTicker.setValue(TimeUtils.getStartTime()+TimeUtils.DAY_LENGTH*28);
+        dateTicker.setValue(TimeUtils.getStartTime() + TimeUtils.DAY_LENGTH * 28);
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
         //Steps 2 to 5
@@ -438,14 +462,14 @@ public class MainViewModelTest {
         mainViewModel.activateTodayView();
         var displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="10km run") {
+            if (displayedGoals.get(i).content() == "10km run") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
             }
         }
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="    ") {
+            if (displayedGoals.get(i).content() == "    ") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -454,7 +478,7 @@ public class MainViewModelTest {
         //Step 7, trying to complete a goal that shouldn't be
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertFalse(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -464,7 +488,7 @@ public class MainViewModelTest {
         mainViewModel.activateTodayView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -472,7 +496,7 @@ public class MainViewModelTest {
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
                 break;
             }
@@ -492,7 +516,7 @@ public class MainViewModelTest {
         mainViewModel.activateTomorrowView();
         displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
         for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content()=="push buttons on keyboard") {
+            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
                 assertFalse(displayedGoals.get(i).completed());
                 break;
             }
@@ -517,7 +541,6 @@ public class MainViewModelTest {
         mainViewModel.addGoal("school", Context.SCHOOL);
         assertCompleteCount(0);
         assertIncompleteCount(4);
-
 
 
         //WIP logic to filter by context
@@ -916,6 +939,7 @@ public class MainViewModelTest {
         mainViewModel.activateRecurringView();
         assertIncompleteCount(1);
     }
+
     @Test
     public void MS2_US6Scenario3() {
         goalRepository = MockGoalRepository.createWithEmptyGoals();
@@ -1112,6 +1136,25 @@ public class MainViewModelTest {
 
     }
 
+
+    @Test
+    public void MS2_US7Scenario1() {
+        //Title: Adding goal without due date
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        assertIncompleteCount(0);
+
+
+        mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
+
+        mainViewModel.activatePendingView();
+        assertIncompleteCount(1);
+        assertCompleteCount(0);
+    }
+
+
     @Test
     public void MS2_US8Scenario1() {
         //Title: Moving goal to today
@@ -1120,15 +1163,15 @@ public class MainViewModelTest {
 
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select today, move pending goal to today logic
-        //assertIncompleteCount(1); //assert goal is not completed
-        //assert the goal's pending is now false
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.moveFromPendingToToday(goal);
+        assertIncompleteCount(0);
         mainViewModel.activateTodayView();
-        //assert the goal is on Today view
-
+        assertIncompleteCount(1); //assert goal is on today view
     }
 
     @Test
@@ -1140,14 +1183,15 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build furniture", Context.HOME);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select tomorrow, move pending goal to tomorrow logic
-        //assertIncompleteCount(1); //assert goal is not completed
-        //assert the goal's pending is now false
-        mainViewModel.activateTomorrowView();
-        //assert the goal is on tomorrow view
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build furniture")).findFirst().orElse(null);
 
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.moveFromPendingToTomorrow(goal);
+        assertIncompleteCount(0);
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1); //assert goal is on tmr view
     }
 
     @Test
@@ -1159,15 +1203,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select finish, move pending goal to today logic
-        //assertCompleteCount(1); //assert goal is completed
-        //assert the goal's pending is now false
+
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
+
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.finishFromPending(goal);
+        assertIncompleteCount(0);
+        mainViewModel.activateTodayView();
+        assertCompleteCount(1); //assert goal is on today view
+        assertIncompleteCount(0);
         mainViewModel.activateTomorrowView();
-        //assert the goal is on today view
-
-
+        assertCompleteCount(0); //assert goal is not on tmr view
+        assertIncompleteCount(0);
     }
 
     @Test
@@ -1179,14 +1228,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select delete logic
-        //assert there are no goals
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
 
+        mainViewModel.deleteGoal(goal.id());
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
     }
-
-
-
 
 }
