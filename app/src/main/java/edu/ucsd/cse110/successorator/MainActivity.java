@@ -23,7 +23,6 @@ import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.databinding.TutorialTextBinding;
 import edu.ucsd.cse110.successorator.lib.domain.AppMode;
 import edu.ucsd.cse110.successorator.ui.CreateGoalDialogFragment;
-import edu.ucsd.cse110.successorator.ui.CreatePendingGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.CreateRecurringGoalDialogFragment;
 import edu.ucsd.cse110.successorator.ui.GoalListAdapter;
 
@@ -121,9 +120,6 @@ public class MainActivity extends AppCompatActivity {
             if (mainViewModel.getCurrentMode().getValue() == AppMode.RECURRING) {
                 var dialogFragment = CreateRecurringGoalDialogFragment.newInstance();
                 dialogFragment.show(getSupportFragmentManager(), "CreateRecurringGoalDialogFragment");
-            } else if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
-                var dialogFragment = CreatePendingGoalDialogFragment.newInstance();
-                dialogFragment.show(getSupportFragmentManager(), "CreatePendingGoalDialogFragment");
             } else {
                 var dialogFragment = CreateGoalDialogFragment.newInstance();
                 dialogFragment.show(getSupportFragmentManager(), "CreateGoalDialogFragment");
