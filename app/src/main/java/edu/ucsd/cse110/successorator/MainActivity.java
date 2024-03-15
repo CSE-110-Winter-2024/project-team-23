@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.successorator;
 
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -72,10 +73,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 //Pending logic so that click does nothing
-                if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
-                    ; // do nothing
+
+                var appMode = mainViewModel.getCurrentMode().getValue();
+
+                if (appMode == AppMode.PENDING || appMode == AppMode.RECURRING) {
+                    // Do nothing
                 } else {
-                    mainViewModel.pressGoal(Math.toIntExact(id));
+                    boolean success = mainViewModel.pressGoal(Math.toIntExact(id));
+                    if (!success) {
+                        // Pasted from piazza
+                        String flavorText = "This goal is still active for Today.  If you've finished this goal for Today, mark it finished in that view.";
+                        if (appMode == AppMode.TODAY) {
+                            flavorText = "This goal is active for Tomorrow.  If you're not done for this goal Tomorrow, unfinish it in that view.";
+                        }
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Goal is still active!")
+                                .setMessage(flavorText)
+                                .show();
+                    }
                 }
             }
         });

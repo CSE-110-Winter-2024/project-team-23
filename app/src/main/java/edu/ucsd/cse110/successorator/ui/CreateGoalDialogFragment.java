@@ -9,9 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.TextView;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
@@ -54,6 +52,11 @@ public class CreateGoalDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
         this.view = FragmentDialogCreateGoalBinding.inflate(getLayoutInflater());
 
+        // Hook up button labels to the view model
+        mainViewModel.getWeeklyButtonString().observe(text -> view.WeeklyRecurringGoalButton.setText(text));
+        mainViewModel.getMonthlyButtonString().observe(text -> view.MonthlyRecurringGoalButton.setText(text));
+        mainViewModel.getYearlyButtonString().observe(text -> view.YearlyRecurringGoalButton.setText(text));
+
 
         // Create listener for context buttons
         this.view.contextRadio.setOnCheckedChangeListener((group, checkedId) -> {
@@ -84,6 +87,10 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 String content = view.goalInput.getText().toString();
 
                 if (context == null) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Invalid context!")
+                            .setMessage("Please select a context for your goal")
+                            .show();
                     return false;
                 }
 
