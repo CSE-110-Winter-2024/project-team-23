@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
@@ -27,7 +28,11 @@ public class RoomGoalRepository implements GoalRepository {
 
     @Override
     public Goal findGoal(int id) {
-        return goalDao.find(id).toGoal();
+        var goal = goalDao.find(id);
+        if (goal == null) {
+            return null;
+        }
+        return goal.toGoal();
     }
 
     @Override
@@ -39,6 +44,14 @@ public class RoomGoalRepository implements GoalRepository {
                             .collect(Collectors.toList());
                 });
         return new LiveDataSubjectAdapter<>(goals);
+    }
+
+    @Override
+    public List<Goal> findAllRaw() {
+        return goalDao.findAll().stream()
+                .filter(Objects::nonNull)
+                .map(GoalEntity::toGoal)
+                .collect(Collectors.toList());
     }
 
     @Override
