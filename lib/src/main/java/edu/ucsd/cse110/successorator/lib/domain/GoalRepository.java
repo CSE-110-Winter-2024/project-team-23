@@ -10,6 +10,8 @@ public interface GoalRepository {
 
     Subject<List<Goal>> findAll();
 
+    List<Goal> findAllRaw();
+
     void update(Goal goal);
 
     int prepend(Goal goal);

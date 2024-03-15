@@ -119,7 +119,7 @@ public class MainViewModel extends ViewModel {
         });
         this.currentDateLocalized.observe(localized -> {
             if (localized == null) return;
-            var goals = this.goalRepository.findAll().getValue();
+            var goals = this.goalRepository.findAllRaw();
             if (goals == null) return;
             for (var goal : goals) {
                 if (goal.recurring()) {

@@ -105,6 +105,11 @@ public class MockGoalRepository implements GoalRepository {
     }
 
     @Override
+    public List<Goal> findAllRaw() {
+        return goals.stream().map(Subject::getValue).collect(Collectors.toList());
+    }
+
+    @Override
     public void update(Goal goal) {
         for (var subject : goals) {
             if (subject.getValue().id() == goal.id()) {

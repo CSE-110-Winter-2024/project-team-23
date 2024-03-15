@@ -95,6 +95,10 @@ public class CreateGoalDialogFragment extends DialogFragment {
                 String content = view.goalInput.getText().toString();
 
                 if (context == null) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Invalid context!")
+                            .setMessage("Please select a context for your goal")
+                            .show();
                     return false;
                 }
                 if (this.recurrenceType != recurrenceType.NONE) {
