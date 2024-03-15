@@ -570,6 +570,29 @@ public class MainViewModel extends ViewModel {
 
     }
 
+    public void moveFromPendingToToday(Goal goal) {
+        activateTodayView();
+        deleteGoal(goal.id());
+        addGoal(goal.content(), goal.context());
+        activatePendingView();
+    }
+
+    public void moveFromPendingToTomorrow(Goal goal) {
+        activateTomorrowView();
+        deleteGoal(goal.id());
+        addGoal(goal.content(), goal.context());
+        activatePendingView();
+    }
+
+    public void finishFromPending(Goal goal) {
+        activateTodayView();
+        deleteGoal(goal.id());
+        int goalId = addGoal(goal.content(),
+                goal.context());
+        pressGoal(goalId);
+        activatePendingView();
+    }
+
 }
 
 //    public AppMode getCurrentMode() {

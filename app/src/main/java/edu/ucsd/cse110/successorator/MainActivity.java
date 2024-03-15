@@ -169,24 +169,13 @@ public class MainActivity extends AppCompatActivity {
         Goal goal = listAdapter.getItem(position);
         switch (Objects.requireNonNull(item.getTitle()).toString()) {
             case "Today":
-                mainViewModel.activateTodayView();
-                mainViewModel.deleteGoal(goal.id());
-                mainViewModel.addGoal(goal.content(), goal.context());
-                mainViewModel.activatePendingView();
+                mainViewModel.moveFromPendingToToday(goal);
                 return true;
             case "Tomorrow":
-                mainViewModel.activateTomorrowView();
-                mainViewModel.deleteGoal(goal.id());
-                mainViewModel.addGoal(goal.content(), goal.context());
-                mainViewModel.activatePendingView();
+                mainViewModel.moveFromPendingToTomorrow(goal);
                 return true;
             case "Finish":
-                mainViewModel.activateTodayView();
-                mainViewModel.deleteGoal(goal.id());
-                int goalId = mainViewModel.addGoal(goal.content(),
-                        goal.context());
-                mainViewModel.pressGoal(goalId);
-                mainViewModel.activatePendingView();
+                mainViewModel.finishFromPending(goal);
                 return true;
             case "Delete":
                 if (mainViewModel.getCurrentMode().getValue() == AppMode.RECURRING) {
