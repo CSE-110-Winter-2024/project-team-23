@@ -1137,6 +1137,25 @@ public class MainViewModelTest {
 
     }
 
+
+    @Test
+    public void MS2_US7Scenario1() {
+        //Title: Adding goal without due date
+
+        goalRepository = MockGoalRepository.createWithEmptyGoals();
+        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
+
+        assertIncompleteCount(0);
+
+
+        mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
+
+        mainViewModel.activatePendingView();
+        assertIncompleteCount(1);
+        assertCompleteCount(0);
+    }
+
+
     @Test
     public void MS2_US8Scenario1() {
         //Title: Moving goal to today
@@ -1145,15 +1164,15 @@ public class MainViewModelTest {
 
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select today, move pending goal to today logic
-        //assertIncompleteCount(1); //assert goal is not completed
-        //assert the goal's pending is now false
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.moveFromPendingToToday(goal);
+        assertIncompleteCount(0);
         mainViewModel.activateTodayView();
-        //assert the goal is on Today view
-
+        assertIncompleteCount(1); //assert goal is on today view
     }
 
     @Test
@@ -1165,14 +1184,15 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build furniture", Context.HOME);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select tomorrow, move pending goal to tomorrow logic
-        //assertIncompleteCount(1); //assert goal is not completed
-        //assert the goal's pending is now false
-        mainViewModel.activateTomorrowView();
-        //assert the goal is on tomorrow view
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build furniture")).findFirst().orElse(null);
 
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.moveFromPendingToTomorrow(goal);
+        assertIncompleteCount(0);
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(1); //assert goal is on tmr view
     }
 
     @Test
@@ -1184,15 +1204,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select finish, move pending goal to today logic
-        //assertCompleteCount(1); //assert goal is completed
-        //assert the goal's pending is now false
+
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
+
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+        mainViewModel.finishFromPending(goal);
+        assertIncompleteCount(0);
+        mainViewModel.activateTodayView();
+        assertCompleteCount(1); //assert goal is on today view
+        assertIncompleteCount(0);
         mainViewModel.activateTomorrowView();
-        //assert the goal is on today view
-
-
+        assertCompleteCount(0); //assert goal is not on tmr view
+        assertIncompleteCount(0);
     }
 
     @Test
@@ -1204,12 +1229,20 @@ public class MainViewModelTest {
         mainViewModel.addPendingGoal("Build car", Context.ERRANDS);
         mainViewModel.activatePendingView();
 
-        //Tap and do nothing
-        //Tap and hold logic
-        //Select delete logic
-        //assert there are no goals
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Build car")).findFirst().orElse(null);
 
+        mainViewModel.deleteGoal(goal.id());
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(0);
+        assertCompleteCount(0);
     }
-
 
 }
