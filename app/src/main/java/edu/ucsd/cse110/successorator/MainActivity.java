@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.top_right_bar, menu);
 
-        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         this.mainViewModel.getCurrentTitleString().observe(str -> {
