@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.ucsd.cse110.successorator.lib.domain.Context;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
@@ -394,158 +395,195 @@ public class MainViewModelTest {
         assertEquals(Context.HOME, repoGoal.context());
     }
 
-    //Based off of the ones written on the master doc
-    //Test 1: Creating various goals (UI testing)
     @Test
-    public void ScenarioBasedSystemTests1() {
+    public void MS2_ScenarioBasedSystemTest1() {
+        //start time is feb 7, 2024
+        dateTicker.setValue(TimeUtils.START_TIME);
 
-        //Starts with cleared database
-        goalRepository = null;
+
         goalRepository = MockGoalRepository.createWithEmptyGoals();
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
-        //Steps 1 to 7
-        //Add one time goal with Home context
-        mainViewModel.addGoal("Go to party tonight", Context.HOME);
-        mainViewModel.addRecurringGoalDateless("Call mom", RecurrenceType.WEEKLY, Context.HOME);
-        assertPresence(1, true);
-        assertCompleteCount(0);
-        assertIncompleteCount(2);
 
-        //Steps 8 to 14
+        // on today view, we create a new goal
+        mainViewModel.activateTodayView();
+        mainViewModel.addGoal("10 km run", Context.HOME); // ID = 1
+        assertIncompleteCount(1);
+
+
+        // on tomorrow view, create a new goal
         mainViewModel.activateTomorrowView();
-        //Add one time goal with Home context
-        mainViewModel.addGoal("Install game update", Context.HOME);
-        mainViewModel.addRecurringGoalDateless("Pay bills", RecurrenceType.MONTHLY, Context.HOME);
-        assertCompleteCount(0);
-        assertIncompleteCount(2);
+        mainViewModel.addRecurringGoal(" ", 2024, 1, 8, RecurrenceType.WEEKLY, Context.HOME);// ID = 2
+        assertIncompleteCount(1);
 
-        //Steps 15 to 24
-        mainViewModel.activatePendingView();
-        //WIP does this really treat as pending? No
-        mainViewModel.addGoal("Research job market", Context.HOME);
-        assertCompleteCount(0);
-        assertIncompleteCount(0);
+
+        // on recurrence view, create a new, daily goal
         mainViewModel.activateRecurringView();
-        mainViewModel.addRecurringGoal("Visit Goal", 2025, 1, 20, RecurrenceType.YEARLY, Context.HOME);
-        assertCompleteCount(0);
-        assertIncompleteCount(3);
+        mainViewModel.addRecurringGoal("push", 2024, 1, 7, RecurrenceType.DAILY, Context.HOME); // ID = 3
+        assertIncompleteCount(2);
 
-    }
 
-    //Test 2: Time handling: Clearing finished goals and keeping recurring goals
-    @Test
-    public void ScenarioBasedSystemTests2() {
-        //Starts with cleared database
-        goalRepository = null;
-        goalRepository = MockGoalRepository.createWithEmptyGoals();
-        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
-
-        //Step 1
-        //Sets up time to be March 7th, 2024
-        dateTicker.setValue(TimeUtils.getStartTime() + TimeUtils.DAY_LENGTH * 28);
-        mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
-
-        //Steps 2 to 5
-        mainViewModel.activateTodayView();
-        mainViewModel.addRecurringGoalDateless("10km run", RecurrenceType.MONTHLY, Context.HOME);
-        mainViewModel.activateTomorrowView();
-        mainViewModel.addRecurringGoalDateless("    ", RecurrenceType.MONTHLY, Context.HOME);
-        mainViewModel.activateTodayView();
-        mainViewModel.addRecurringGoalDateless("push buttons on keyboard", RecurrenceType.DAILY, Context.HOME);
+        // on pending view, create a new goal
         mainViewModel.activatePendingView();
-        mainViewModel.addGoal("@everyone", Context.HOME);
-        assertCompleteCount(0);
+        mainViewModel.addPendingGoal("@everyone", Context.HOME); // ID = 4
+        assertIncompleteCount(1);
+
+
+        //checking today view to make sure it now has two goals
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(2);
+
+
+        // now we start marking goals complete
+        mainViewModel.pressGoal(1);
+        assertIncompleteCount(1);
+
+
+        mainViewModel.activateTomorrowView();
+        // first check that there are two incomplete goals in the view
+        assertIncompleteCount(2);
+        Goal goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                " ")).findFirst().orElse(null);
+        mainViewModel.pressGoal(goal.id());
+        assertIncompleteCount(1);
+
+
+        // pressing the recurring goal should fail because of the
+        // same goal that is in the today view
+        goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "push")).findFirst().orElse(null);
+
+
+        assertFalse(mainViewModel.pressGoal(goal.id()));
+
+
+        // now go to today view and mark the goal complete
+        mainViewModel.activateTodayView();
+        goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "push")).findFirst().orElse(null);
+
+
+        assertTrue(mainViewModel.pressGoal(goal.id()));
         assertIncompleteCount(0);
 
-        //Step 6
-        mainViewModel.activateTodayView();
-        var displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "10km run") {
-                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
-            }
-        }
+
+        // go back to tomorrow view and mark the goal complete
         mainViewModel.activateTomorrowView();
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "    ") {
-                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
-                break;
-            }
-        }
+        goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "push")).findFirst().orElse(null);
+        assertTrue(mainViewModel.pressGoal(goal.id()));
+        assertIncompleteCount(0);
 
-        //Step 7, trying to complete a goal that shouldn't be
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
-                assertFalse(mainViewModel.pressGoal(displayedGoals.get(i).id()));
-                break;
-            }
-        }
 
-        //Step 8
+        // long press the pending goal, press finish
+        mainViewModel.activatePendingView();
+        goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "@everyone")).findFirst().orElse(null);
+
+
+        mainViewModel.finishFromPending(goal);
+        assertIncompleteCount(0);
+
+
+        // check today view to see if the goal is there
         mainViewModel.activateTodayView();
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
-                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
-                break;
-            }
-        }
-        mainViewModel.activateTomorrowView();
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
-                assertTrue(mainViewModel.pressGoal(displayedGoals.get(i).id()));
-                break;
-            }
-        }
+        goal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "@everyone")).findFirst().orElse(null);
+        assertNotNull(goal);
 
-        //Step 9 WIP pending behavior
 
-        //Step 10 to 12
+        // check the status of the recurrence goal for today and tomorrow
         mainViewModel.advance24Hours();
         mainViewModel.activateTodayView();
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
+        assertIncompleteCount(0);
 
-        //For later after pending goal behaviors are done
-        //assertEquals(1, displayedGoals.size());
-        //assertTrue(displayedGoals.get(0).content()=="push buttons on keyboard");
 
         mainViewModel.activateTomorrowView();
-        displayedGoals = mainViewModel.getGoalsToDisplay().getValue();
-        for (int i = 0; i < displayedGoals.size(); i++) {
-            if (displayedGoals.get(i).content() == "push buttons on keyboard") {
-                assertFalse(displayedGoals.get(i).completed());
-                break;
-            }
+        assertIncompleteCount(1);
+
+
+        // check again, so that everything should be incomplete now
+        mainViewModel.advance24Hours();
+        assertIncompleteCount(1);
+
+
+        mainViewModel.activateTodayView();
+        assertIncompleteCount(1);
+
+
+        // Go to March 5
+        for(int i = 0; i < 26; i++) {
+            mainViewModel.advance24Hours();
         }
 
 
+        // Now, the weekly occurring goal should also appear in the tomorrow view
+        mainViewModel.activateTodayView();
+//        assertIncompleteCount(1);
+
+
+        mainViewModel.activateTomorrowView();
+        assertIncompleteCount(2);
     }
 
-    //Test 3: Correctly display, filter and order goals
+
     @Test
-    public void ScenarioBasedSystemTests3() {
-        //Starts with cleared database
-        goalRepository = null;
+    public void MS2_ScenarioBasedSystemTest3() {
+        dateTicker.setValue(TimeUtils.START_TIME);
+
+
+        // start with empty database
         goalRepository = MockGoalRepository.createWithEmptyGoals();
         mainViewModel = new MainViewModel(goalRepository, dateOffset, dateTicker, localizedCalendar);
 
-        //Steps 1 to 8
 
+        // go to tomorrow view and add work and home goals
+        // also add a recurring errand goal
+        mainViewModel.activateTomorrowView();
         mainViewModel.addGoal("work", Context.WORK);
         mainViewModel.addGoal("home", Context.HOME);
-        mainViewModel.addGoal("errands", Context.ERRANDS);
-        mainViewModel.addGoal("school", Context.SCHOOL);
-        assertCompleteCount(0);
-        assertIncompleteCount(4);
+        mainViewModel.addRecurringGoal("Errand", 2024, 1, 8, RecurrenceType.DAILY, Context.ERRANDS);
 
 
-        //WIP logic to filter by context
+        // check that all three exist in the current view
+        assertIncompleteCount(3);
+        List<Goal> goals = mainViewModel.getGoalsToDisplay().getValue().stream().collect(Collectors.toList());
+        Goal workGoal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "work")).findFirst().orElse(null);
+        Goal homeGoal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "home")).findFirst().orElse(null);
+        Goal errandGoal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "Errand")).findFirst().orElse(null);
+        assertTrue(goals.contains(workGoal));
+        assertTrue(goals.contains(homeGoal));
+        assertTrue(goals.contains(errandGoal));
 
+
+        // add two more goals, school and cat
+        mainViewModel.addRecurringGoal("School", 2024, 1, 8, RecurrenceType.YEARLY, Context.SCHOOL);
+        mainViewModel.addRecurringGoal("cat", 2024, 1, 8, RecurrenceType.WEEKLY, Context.HOME);
+        Goal schoolGoal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "School")).findFirst().orElse(null);
+        Goal catGoal = mainViewModel.getGoalsToDisplay().getValue().stream().filter(g -> g.content().equals(
+                "cat")).findFirst().orElse(null);
+
+
+        // confirm that they exist in the current view
+        goals = mainViewModel.getGoalsToDisplay().getValue().stream().collect(Collectors.toList());
+        assertTrue(goals.contains(schoolGoal));
+        assertTrue(goals.contains(catGoal));
+
+
+        // set the focus mode to HOME
+        mainViewModel.setFocusHome();
+        goals = mainViewModel.getGoalsToDisplay().getValue().stream().collect(Collectors.toList());
+        assertTrue(goals.contains(catGoal));
+        assertTrue(goals.contains(homeGoal));
+        assertFalse(goals.contains(workGoal));
+        assertFalse(goals.contains(errandGoal));
+        assertFalse(goals.contains(schoolGoal));
     }
+
 
 
     @Test
