@@ -5,6 +5,7 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.PENDING;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TODAY;
 import static edu.ucsd.cse110.successorator.lib.domain.AppMode.TOMORROW;
+import static edu.ucsd.cse110.successorator.lib.util.TimeUtils.nthDayofWeek;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
@@ -471,6 +472,28 @@ public class MainViewModel extends ViewModel {
         handleRecurringGoalGeneration(recurringGoal, currentTime);
     }
 
+    // Method that adds date text when a recurring goal will reoccur
+    public String getGoalContent(Goal goal) {
+        if (currentMode.getValue() == AppMode.RECURRING) {
+            var startDate = TimeUtils.localize(goal.startDate(), dateConverter);
+
+            switch (goal.recurrenceType()) {
+                case DAILY:
+                    return goal.content() + ", Daily";
+                case WEEKLY:
+                    return goal.content() + ", Weekly on " + startDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                case MONTHLY:
+                    return goal.content() + ", Monthly on " + nthDayofWeek(startDate);
+                case YEARLY:
+                    return goal.content() + ", Yearly on " + (startDate.get(Calendar.MONTH) + 1) + "/" + startDate.get(Calendar.DAY_OF_MONTH);
+                default:
+                    return goal.content();
+            }
+        } else {
+            return goal.content();
+        }
+    }
+
     // Public for testing
     // Only call from a context where it won't recurse into LiveData updates
     public void handleRecurringGoalGeneration(Goal recurringGoal, Calendar currentDate) {
@@ -560,7 +583,6 @@ public class MainViewModel extends ViewModel {
                 }
             }
         }
-
-
     }
 }
+
