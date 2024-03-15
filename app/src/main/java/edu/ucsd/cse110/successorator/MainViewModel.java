@@ -156,7 +156,7 @@ public class MainViewModel extends ViewModel {
 
         this.currentContext.observe(context -> {
             if (context == null) return;
-            var goals = this.goalRepository.findAll().getValue();
+            var goals = this.goalRepository.findAllRaw();
             if (goals == null) return;
             // Filter the goals on context
             var goalsToDisplay = goals.stream().filter(goal -> GoalUtils.shouldShowContext(goal, context)).collect(Collectors.toList());
