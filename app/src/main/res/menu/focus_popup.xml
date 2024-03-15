@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home_popup"
+        android:title="Home"
+        android:gravity="top|left"/>
+    <item
+        android:id="@+id/work_popup"
+        android:title="Work"
+        android:gravity="top|left"/>
+    <item
+        android:id="@+id/school_popup"
+        android:title="School"
+        android:gravity="top|left"/>
+    <item
+        android:id="@+id/errands_popup"
+        android:title="Errands"
+        android:gravity="top|left"/>
+    <item
+        android:id="@+id/cancel_popup"
+        android:title="Cancel"
+        android:gravity="top|left"/>
+
+</menu>
