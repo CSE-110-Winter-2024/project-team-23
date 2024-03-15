@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             //View anchor = this.findViewById(android.R.id.home);
             View anchor = this.findViewById(R.id.change_view_menu);
             PopupMenu focusMenu = new PopupMenu(this, anchor);
-            focusMenu.setGravity(Gravity.BOTTOM);
             focusMenu.getMenuInflater().inflate(R.menu.focus_popup, focusMenu.getMenu());
             focusMenu.setOnMenuItemClickListener(this::onFocusMenuItemClick);
             focusMenu.show();
