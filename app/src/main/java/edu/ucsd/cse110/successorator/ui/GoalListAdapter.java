@@ -53,21 +53,41 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
             binding.background.setBackgroundColor(Color.WHITE);
         }
 
+        // Logic for letter shown inside
+        if (goal.context() == Context.HOME) {
+            binding.listItemLetter.setText("H");
+        }
+        if (goal.context() == Context.WORK) {
+            binding.listItemLetter.setText("W");
+        }
+        if (goal.context() == Context.SCHOOL) {
+            binding.listItemLetter.setText("S");
+        }
+        if (goal.context() == Context.ERRANDS) {
+            binding.listItemLetter.setText("E");
+        }
+
         /*
         Logic for color of the list context icon
          */
-        if (goal.context() == Context.HOME) {
-            binding.imageView.setColorFilter(Color.parseColor("#faf04d"));
+        if (goal.completed()) {
+            binding.imageView.setColorFilter(Color.parseColor("#aba8a7"));
         }
-        if (goal.context() == Context.WORK) {
-            binding.imageView.setColorFilter(Color.parseColor("#31c7f8"));
+        else {
+            if (goal.context() == Context.HOME) {
+                binding.imageView.setColorFilter(Color.parseColor("#faf04d"));
+            }
+            if (goal.context() == Context.WORK) {
+                binding.imageView.setColorFilter(Color.parseColor("#31c7f8"));
+            }
+            if (goal.context() == Context.SCHOOL) {
+                binding.imageView.setColorFilter(Color.parseColor("#c95bf9"));
+            }
+            if (goal.context() == Context.ERRANDS) {
+                binding.imageView.setColorFilter(Color.parseColor("#a2cb84"));
+            }
         }
-        if (goal.context() == Context.SCHOOL) {
-            binding.imageView.setColorFilter(Color.parseColor("#c95bf9"));
-        }
-        if (goal.context() == Context.ERRANDS) {
-            binding.imageView.setColorFilter(Color.parseColor("#a2cb84"));
-        }
+
 
 
         return binding.getRoot();
