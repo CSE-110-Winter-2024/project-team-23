@@ -776,15 +776,14 @@ public class MainViewModelTest {
         mainViewModel.addGoal("Work", Context.WORK);
         mainViewModel.addGoal("Home1", Context.HOME);
         mainViewModel.addGoal("Home2", Context.HOME);
-        mainViewModel.activateFocusMode(Context.ERRANDS);
+        mainViewModel.setFocusErrands();
         assertIncompleteCount(2);
         mainViewModel.addGoal("Errand3", Context.ERRANDS);
         assertIncompleteCount(3);
-        mainViewModel.activateFocusMode(Context.WORK);
+        mainViewModel.setFocusWork();
         assertIncompleteCount(1);
-        mainViewModel.activateFocusMode(Context.SCHOOL);
+        mainViewModel.setFocusSchool();
         assertIncompleteCount(1);
-        mainViewModel.activateFocusMode(Context.ERRANDS);
     }
 
     //Focus sorting testing.

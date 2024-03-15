@@ -157,7 +157,7 @@ public class MainViewModel extends ViewModel {
 
         this.currentContext.observe(context -> {
             if (context == null) return;
-            var goals = this.goalRepository.findAll().getValue();
+            var goals = this.goalRepository.findAllRaw();
             if (goals == null) return;
             // Filter the goals on context
             var goalsToDisplay = goals.stream().filter(goal -> GoalUtils.shouldShowContext(goal, context)).collect(Collectors.toList());
@@ -309,12 +309,23 @@ public class MainViewModel extends ViewModel {
     }
 
     // Open question whether this method should take a Context or a String
-    public void activateFocusMode(Context context) {
+    private void activateFocusMode(Context context) {
         this.currentContext.setValue(context);
     }
-
+    public void setFocusHome(){
+        this.activateFocusMode(Context.HOME);
+    }
+    public void setFocusWork(){
+        this.activateFocusMode(Context.WORK);
+    }
+    public void setFocusSchool(){
+        this.activateFocusMode(Context.SCHOOL);
+    }
+    public void setFocusErrands(){
+        this.activateFocusMode(Context.ERRANDS);
+    }
     public void deactivateFocusMode() {
-        this.currentContext.setValue(Context.NONE);
+        this.activateFocusMode(Context.NONE);
     }
 
     public void activateTodayView() {

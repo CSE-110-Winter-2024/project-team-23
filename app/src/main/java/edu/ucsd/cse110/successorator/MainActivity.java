@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.top_right_bar, menu);
 
-        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_media_ff);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         this.mainViewModel.getCurrentTitleString().observe(str -> {
@@ -131,10 +132,17 @@ public class MainActivity extends AppCompatActivity {
             View anchor = this.findViewById(R.id.change_view_menu);
             PopupMenu viewMenu = new PopupMenu(this, anchor);
             viewMenu.getMenuInflater().inflate(R.menu.view_popup, viewMenu.getMenu());
-            viewMenu.setOnMenuItemClickListener(i -> onMenuItemClick(i));
+            viewMenu.setOnMenuItemClickListener(this::onViewMenuItemClick);
             viewMenu.show();
         } else if (itemId == android.R.id.home) {
-            this.mainViewModel.advance24Hours();
+            //View anchor = this.findViewById(android.R.id.home);
+            View anchor = this.findViewById(R.id.change_view_menu);
+            PopupMenu focusMenu = new PopupMenu(this, anchor);
+            focusMenu.getMenuInflater().inflate(R.menu.focus_popup, focusMenu.getMenu());
+            focusMenu.setOnMenuItemClickListener(this::onFocusMenuItemClick);
+            focusMenu.show();
+            //TODO: Reimplement this somewhere else.
+            //this.mainViewModel.advance24Hours();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -144,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         return listAdapter;
     }
 
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onViewMenuItemClick(MenuItem item) {
         var itemId = item.getItemId();
         boolean clicked = true;
         if (itemId == R.id.today_popup) {
@@ -155,6 +163,30 @@ public class MainActivity extends AppCompatActivity {
             this.mainViewModel.activatePendingView();
         } else if (itemId == R.id.recurring_popup) {
             this.mainViewModel.activateRecurringView();
+        } else {
+            clicked = false;
+        }
+        return clicked;
+    }
+
+    public boolean onFocusMenuItemClick(MenuItem item) {
+        var itemId = item.getItemId();
+        boolean clicked = true;
+        if (itemId == R.id.home_popup) {
+            this.mainViewModel.setFocusHome();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_home);
+        } else if (itemId == R.id.work_popup) {
+            this.mainViewModel.setFocusWork();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_work);
+        } else if (itemId == R.id.school_popup) {
+            this.mainViewModel.setFocusSchool();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_school);
+        } else if (itemId == R.id.errands_popup) {
+            this.mainViewModel.setFocusErrands();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger_errands);
+        } else if (itemId == R.id.cancel_popup) {
+            this.mainViewModel.deactivateFocusMode();
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburger);
         } else {
             clicked = false;
         }
