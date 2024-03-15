@@ -39,4 +39,24 @@ Successorator is an Android app, designed to help people keep track of their dai
 - [x] - Setup GitHub repo (branch protection, CI, etc) (1hr)
 - [ ] - Create app in android studio and push basic stuff to git (1hr)
 
+## Post Iteration 1 planning 
 
+### Post Iteration 1 (15/18)
+US1: Menu to swap between type of goal displayed High, 4/4hr
+US3: Context assignment for new goal High, 4/4hr 
+US6: View and create recurring goal on Recurring page High, 6/9hr
+Loose task: Iteration 1 testing, 1hr
+
+Team Velocity = 15 / 30 =  0.5
+
+Due to some issues with scheduling, some members did not work all 6 hours of the week. Therefore, the total amount of hours worked is reduced. Some of the tasks for Stories in iteration 2 has overlap with tasks done in iteration 1 such as the logic needed being mostly complete. Therefore, the hours needed to complete stories 2, 4, 5, and 7 are reduced.
+
+### Planned Iteration 2 (17.75/18)
+US2: Order/group by Context (+ Focus Mode Filter) Medium, 5hr -> 4hr
+US4: View and create goal on Tomorrow page Low, 4hr -> 2.5hr
+US5: Create recurring goal on “currently selected” day Low, 2hr -> 1.5hr
+US6: View and create recurring goal on Recurring page High, 3hr
+US7: Create pending goal Medium, 2hr -> 1.75hr
+US 8: Move pending goal Low 3hr
+Loose task: Iteration 2 testing, 1hr
+Loose task: Milestone 2 testing, 1hr
