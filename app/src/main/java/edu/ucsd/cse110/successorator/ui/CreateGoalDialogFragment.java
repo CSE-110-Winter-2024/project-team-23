@@ -81,7 +81,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
 
         // pending goals don't need to be assigned a time
         if (mainViewModel.getCurrentMode().getValue() == AppMode.PENDING) {
-            this.view.reucurrenceRadio.setVisibility(View.GONE);
+            this.view.recurrenceRadio.setVisibility(View.GONE);
         } else {
           // Create listener for recurrence buttons
           this.view.recurrenceRadio.setOnCheckedChangeListener((group, checkedId) -> {
